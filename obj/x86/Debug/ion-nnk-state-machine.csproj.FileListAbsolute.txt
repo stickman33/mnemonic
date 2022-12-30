@@ -1,0 +1,2 @@
+D:\my projects\ion-nnk-state-machine\obj\x86\Debug\ion-nnk-state-machine.csproj.AssemblyReference.cache
+D:\my projects\ion-nnk-state-machine\obj\x86\Debug\ion-nnk-state-machine.csproj.CoreCompileInputs.cache

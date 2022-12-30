@@ -1,0 +1,17 @@
+﻿table.collapsed-table {
+    border-collapse: collapse;
+}
+
+
+    table.collapsed-table td {
+        text-align: center;
+    }
+
+table.bordered-table td, table.bordered-table th {
+    text-align: center;
+    border: 1px solid black;
+}
+
+div.timeline_scale_major_panel {
+    display:none;
+}
