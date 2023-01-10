@@ -13,20 +13,19 @@
         isPredicted: boolean;
     }
 
-    export interface Cuclogram {
+    export interface Cyclogram {
         GUID: string,
-        Created: Date,
-        Modified: Date,
-        SIPID: number,
+        UIModified: Date,
         comment: string,
-        Type: string
+        Title: string,
+        Editor: string
     }
 
-    export interface CyclogramInFlight extends Cuclogram {
+    export interface CyclogramInFlight extends Cyclogram {
         StartTime: Date,
     }
 
-    export interface CyclogamInPass extends Cuclogram {
+    export interface CyclogamInPass extends Cyclogram {
 
     }
 

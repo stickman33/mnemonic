@@ -1,0 +1,7 @@
+D:\my projects\ion-nnk-state-mnemonic\bin\TypeScriptHTMLApp1.dll.config
+D:\my projects\ion-nnk-state-mnemonic\bin\TypeScriptHTMLApp1.dll
+D:\my projects\ion-nnk-state-mnemonic\bin\TypeScriptHTMLApp1.pdb
+D:\my projects\ion-nnk-state-mnemonic\obj\Debug\ion-nnk-state-mnemonic.csproj.AssemblyReference.cache
+D:\my projects\ion-nnk-state-mnemonic\obj\Debug\ion-nnk-state-mnemonic.csproj.CoreCompileInputs.cache
+D:\my projects\ion-nnk-state-mnemonic\obj\Debug\TypeScriptHTMLApp1.dll
+D:\my projects\ion-nnk-state-mnemonic\obj\Debug\TypeScriptHTMLApp1.pdb

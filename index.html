@@ -30,7 +30,7 @@
 
 </head>
 <body>
-    <h2>Редактор циклограмм</h2>
+    <h2>Мнемосхема</h2>
 
     <div>
         <span>Ионосфера-М № </span>
@@ -43,21 +43,20 @@
             <thead>
                 <tr>
                     <!--<th colspan="2">
-                        <button data-bind="enable: $root.cyclogramEditable.GUID() === '' , click: function(){$root.AddCyclogram($root);}">Создать</button>
-                        <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.EditCyclogramContent($root);}">Загрузить</button>
-                        <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.EditCyclogram($root);}">Редактировать</button>
-                        <button data-bind="enable: $root.cyclogramEditable.GUID() !== '' , click: function(){$root.SaveCyclogram($root);}">Сохранить</button>
-                        <button data-bind="enable: $root.cyclogramEditable.GUID() !== '' , click: function(){$root.CanselCyclogram($root);}">Отменить</button>
-                        <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.RemoveCyclogram($root);}">Удалить</button>
-                        <span>ID</span>
-                    </th>-->
-                    <th>Тип</th>
-                    <th>Комментарий</th>
-                    <th>Время начала</th>
-                    <th>Created</th>
-                    <th>Слова данных</th>
+                    <button data-bind="enable: $root.cyclogramEditable.GUID() === '' , click: function(){$root.AddCyclogram($root);}">Создать</button>
+                    <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.EditCyclogramContent($root);}">Загрузить</button>
+                    <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.EditCyclogram($root);}">Редактировать</button>
+                    <button data-bind="enable: $root.cyclogramEditable.GUID() !== '' , click: function(){$root.SaveCyclogram($root);}">Сохранить</button>
+                    <button data-bind="enable: $root.cyclogramEditable.GUID() !== '' , click: function(){$root.CanselCyclogram($root);}">Отменить</button>
+                    <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.RemoveCyclogram($root);}">Удалить</button>
+                    <span>ID</span>
+                </th>-->
+                    <th></th>
+                    <th>GUID</th>
                     <th>Изменено</th>
-                    <th>СИП</th>
+                    <th>Название</th>
+                    <th>Комментарий</th>
+                    <th>Редактор</th>
                 </tr>
                 <tr></tr>
             </thead>
@@ -67,68 +66,81 @@
                         <input type="radio" name="radioCyclogram" data-bind="checkedValue: $data.GUID, checked: $root.selectedCyclogramGUID">
                     </td>
                     <!--<td>
-                        <button data-bind="enable: $data.GUID !== $root.cyclogramEditable.GUID(), click: function(){$root.EditCyclogramContent($data,$root);}">Content</button>
-                        <button data-bind="enable: $data.GUID !== $root.cyclogramEditable.GUID(), click: function(){$root.EditCyclogram($data,$root);}">E</button>
-                        <button data-bind="enable: $data.GUID === $root.cyclogramEditable.GUID(), click: function(){$root.SaveCyclogram($root);}">S</button>
-                        <button data-bind="enable: $data.GUID === $root.cyclogramEditable.GUID(), click: function(){$root.CanselCyclogram($root);}">C</button>
-                        <button data-bind="enable: $data.GUID !== $root.cyclogramEditable.GUID(), click: function(){$root.RemoveCyclogram($data,$root);}">D</button>
-                    </td>-->
+                    <button data-bind="enable: $data.GUID !== $root.cyclogramEditable.GUID(), click: function(){$root.EditCyclogramContent($data,$root);}">Content</button>
+                    <button data-bind="enable: $data.GUID !== $root.cyclogramEditable.GUID(), click: function(){$root.EditCyclogram($data,$root);}">E</button>
+                    <button data-bind="enable: $data.GUID === $root.cyclogramEditable.GUID(), click: function(){$root.SaveCyclogram($root);}">S</button>
+                    <button data-bind="enable: $data.GUID === $root.cyclogramEditable.GUID(), click: function(){$root.CanselCyclogram($root);}">C</button>
+                    <button data-bind="enable: $data.GUID !== $root.cyclogramEditable.GUID(), click: function(){$root.RemoveCyclogram($data,$root);}">D</button>
+                </td>-->
+                    <!--<td data-bind="text:UIModified, format: 'UTC: yyyy-mm-dd\'T\'HH:MM:ss.SSS\'Z\''"></td>-->
                     <td data-bind="text:GUID"></td>
+                    <td data-bind="text:UIModified"></td>
+                    <td data-bind="text:Title"></td>
+                    <td data-bind="text:comment"></td>
+                    <td data-bind="text:Editor"></td>
 
-                    <td>
-                        <span data-bind="visible:$data.GUID !== $root.cyclogramEditable.GUID(), text:Type"></span>
-                        <div data-bind="visible:$data.GUID === $root.cyclogramEditable.GUID()">
-                            <select data-bind="options: rlab.nkpori.CyclogramTypes, optionsValue: 'key', optionsText: 'title', value: $root.cyclogramEditable.Type"></select>
-                        </div>
-                    </td>
-                    <td>
-                        <span data-bind="visible:$data.GUID !== $root.cyclogramEditable.GUID(), text:comment"></span>
-                        <textarea data-bind="visible:$data.GUID === $root.cyclogramEditable.GUID(), textInput:$root.cyclogramEditable.comment"></textarea>
-                    </td>
-                    <td>
-                        <span data-bind="visible:$data.GUID !== $root.cyclogramEditable.GUID(), text:StartTime, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></span>
-                        <input data-bind="visible:$data.GUID === $root.cyclogramEditable.GUID() && $root.cyclogramEditable.Type() === rlab.nkpori.CyclogramTypes[0].key, datetimeValue:$root.cyclogramEditable.StartTime" />
-                    </td>
-                    <td data-bind="text:Created, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
-                    <td data-bind="text:Modified, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
-
-                    <td data-bind="text:SIPID"></td>
-                </tr>
-            </tbody>
-            <tbody>
-                <tr>
-                    <td>
-                        <input type="radio" disabled name="radioCyclogram" data-bind="checkedValue: '00000000-0000-0000-0000-000000000000', checked: $root.selectedCyclogramGUID">
-                    </td>
                     <!--<td>
-                        <button data-bind="enable: '00000000-0000-0000-0000-000000000000' !== $root.cyclogramEditable.GUID(), click: function(){$root.AddCyclogram($root);}">ADD</button>
-                        <button data-bind="enable: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID(), click: function(){$root.SaveCyclogram($root);}">S</button>
-                        <button data-bind="enable: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID(), click: function(){$root.CanselCyclogram($root);}">C</button>
-                    </td>-->
-                    <td>
-                        <span data-bind="visible: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID()">00000000-0000-0000-0000-000000000000</span>
-                    </td>
-                    <td>
-                        <div data-bind="visible:'00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID()">
-                            <select data-bind="options: rlab.nkpori.CyclogramTypes, optionsValue: 'key', optionsText: 'title', value: $root.cyclogramEditable.Type"></select>
-                        </div>
-                    </td>
-                    <td>
-                        <textarea data-bind="visible:'00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID(), textInput:$root.cyclogramEditable.comment"></textarea>
-                    </td>
-                    <td>
-                        <input data-bind="visible:'00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID() && $root.cyclogramEditable.Type() === rlab.nkpori.CyclogramTypes[0].key, datetimeValue:$root.cyclogramEditable.StartTime" />
-                    </td>
-                    <td></td>
-                    <td>
-                        <span data-bind="visible: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID()">-1</span>
-                    </td>
+                    <span data-bind="visible:$data.GUID !== $root.cyclogramEditable.GUID(), text:Type"></span>
+                    <div data-bind="visible:$data.GUID === $root.cyclogramEditable.GUID()">
+                        <select data-bind="options: rlab.nkpori.CyclogramTypes, optionsValue: 'key', optionsText: 'title', value: $root.cyclogramEditable.Type"></select>
+                    </div>
+                </td>
+                <td>
+                    <span data-bind="visible:$data.GUID !== $root.cyclogramEditable.GUID(), text:comment"></span>
+                    <textarea data-bind="visible:$data.GUID === $root.cyclogramEditable.GUID(), textInput:$root.cyclogramEditable.comment"></textarea>
+                </td>
+                <td>
+                    <span data-bind="visible:$data.GUID !== $root.cyclogramEditable.GUID(), text:StartTime, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></span>
+                    <input data-bind="visible:$data.GUID === $root.cyclogramEditable.GUID() && $root.cyclogramEditable.Type() === rlab.nkpori.CyclogramTypes[0].key, datetimeValue:$root.cyclogramEditable.StartTime" />
+                </td>
+                <td data-bind="text:Created, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
+                <td data-bind="text:Modified, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
+
+                <td data-bind="text:SIPID"></td>-->
                 </tr>
             </tbody>
+
+            <!--<tbody>
+        <tr>
+            <td>
+                <input type="radio" disabled name="radioCyclogram" data-bind="checkedValue: '00000000-0000-0000-0000-000000000000', checked: $root.selectedCyclogramGUID">
+            </td>-->
+            <!--<td>
+            <button data-bind="enable: '00000000-0000-0000-0000-000000000000' !== $root.cyclogramEditable.GUID(), click: function(){$root.AddCyclogram($root);}">ADD</button>
+            <button data-bind="enable: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID(), click: function(){$root.SaveCyclogram($root);}">S</button>
+            <button data-bind="enable: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID(), click: function(){$root.CanselCyclogram($root);}">C</button>
+        </td>-->
+            <!--<td>
+                    <span data-bind="visible: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID()">00000000-0000-0000-0000-000000000000</span>
+                </td>
+                <td>
+                    <div data-bind="visible:'00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID()">
+                        <select data-bind="options: rlab.nkpori.CyclogramTypes, optionsValue: 'key', optionsText: 'title', value: $root.cyclogramEditable.Type"></select>
+                    </div>
+                </td>
+                <td>
+                    <textarea data-bind="visible:'00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID(), textInput:$root.cyclogramEditable.comment"></textarea>
+                </td>
+                <td>
+                    <input data-bind="visible:'00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID() && $root.cyclogramEditable.Type() === rlab.nkpori.CyclogramTypes[0].key, datetimeValue:$root.cyclogramEditable.StartTime" />
+                </td>
+                <td></td>
+                <td>
+                    <span data-bind="visible: '00000000-0000-0000-0000-000000000000' === $root.cyclogramEditable.GUID()">-1</span>
+                </td>
+            </tr>
+        </tbody>-->
+
         </table>
+
+        <button id="back" data-bind="click: function(){$root.prevCyclogramPage();}">Back</button>
+        <button id="next" data-bind="click: function(){$root.nextCyclogramPage();}">Next</button>
+        <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.ShowCyclogramContent($root);}">Загрузить</button>
     </div>
 
-    <div>
+
+
+    <!--<div>
         <h4>Команды</h4>
         <table class="collapsed-table bordered-table">
             <thead>
@@ -137,174 +149,142 @@
                         <input type="checkbox" data-bind="checked: isAllCommandsCheck, checkboxIndeterminate: isAllCommandsIndeterminate">
                     </td>
                     <td colspan="2">
-                        <button data-bind="enable:comandsCGGuid() !== '', click: function(){CommandAdd($root)}">Создать</button>
-                        <!--<button data-bind="enable:comandsCGGuid() !== '', click: function(){SaveCyclogramContent($root)}">Save ALL</button>-->
-                        <button data-bind="disable:commandsChecked().length == 0, click: function(){CommandsDelete($root)}">Удалить</button>
-                        <button data-bind="enable:comandsCGGuid() !== '', click: function(){CanselCyclogramContent($root)}">Отменить</button>
-                    </td>
-                    <td colspan="7">
-                        <span>Время</span>
-                        <select data-bind="options: rlab.nkpori.TimeRepresentType, optionsValue: 'key', optionsText: 'title', value: time_represent"></select>
+                        <button data-bind="enable:comandsCGGuid() !== '', click: function(){CommandAdd($root)}">Создать</button>-->
+    <!--<button data-bind="enable:comandsCGGuid() !== '', click: function(){SaveCyclogramContent($root)}">Save ALL</button>-->
+    <!--<button data-bind="disable:commandsChecked().length == 0, click: function(){CommandsDelete($root)}">Удалить</button>
+            <button data-bind="enable:comandsCGGuid() !== '', click: function(){CanselCyclogramContent($root)}">Отменить</button>
+        </td>
+        <td colspan="7">
+            <span>Время</span>
+            <select data-bind="options: rlab.nkpori.TimeRepresentType, optionsValue: 'key', optionsText: 'title', value: time_represent"></select>
 
-                        <span>Каскадное изменение команд:</span>
-                        <span data-bind="foreach: rlab.nkpori.TimeCascadeType">
-                            <label><input type="radio" name="timeCascadeType" data-bind="checkedValue: $data.key, checked: $root.time_cascade"><span data-bind="text:$data.title"></span></label>
+            <span>Каскадное изменение команд:</span>
+            <span data-bind="foreach: rlab.nkpori.TimeCascadeType">
+                <label><input type="radio" name="timeCascadeType" data-bind="checkedValue: $data.key, checked: $root.time_cascade"><span data-bind="text:$data.title"></span></label>
 
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <th colspan="2"></th>
-                    <!--<th>GUIDCyclogram</th>-->
-                    <th>Время</th>
-                    <th>Имя</th>
-                    <th>Код</th>
-                    <th>ID</th>
-                    <th>Время отправки</th>
-                    <th>Статус</th>
-                    <!--<th>Title</th>-->
-                    <th>Слова данных</th>
-                    <!--<th>dataRate</th>-->
-                    <!--<th>power</th>-->
-                    <th>Created</th>
-                </tr>
-            </thead>
-            <tbody data-bind="visible:$root.commandEditable.GUID() === '00000000-0000-0000-0000-000000000000'">
-                <tr>
-                    <td>
-                        <input type="checkbox" disabled />
-                        <button disabled>Р</button>
-                        <button data-bind="click: function(){ $root.CommandSave(      $root); }">С</button>
-                        <button data-bind="click: function(){ $root.CommandCansel(    $root); }">О</button>
-                    </td>
-                    <td>00000000-0000-0000-0000-000000000000</td>
-                    <td>
-                        <input data-bind="visible: $root.time_represent() == 'fromBegin',       timespanValue: {begin: new Date(0) , end: $root.commandEditable.time }">
-                        <input data-bind="visible: $root.time_represent() == 'fromPrevious',     timespanValue: {begin: new Date(0)  , end: $root.commandEditable.time }">
-                    </td>
-                    <td>
-                        <select data-bind="options: $root.definitions,
-                        optionsText: 'Title',
-                        optionsValue: 'GUID',
-                        value: $root.commandEditable.GUIDCommand_def"></select>
-                    </td>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <th colspan="2"></th>-->
+    <!--<th>GUIDCyclogram</th>-->
+    <!--<th>Время</th>
+    <th>Имя</th>
+    <th>Код</th>
+    <th>ID</th>
+    <th>Время отправки</th>
+    <th>Статус</th>-->
+    <!--<th>Title</th>-->
+    <!--<th>Слова данных</th>-->
+    <!--<th>dataRate</th>-->
+    <!--<th>power</th>-->
+    <!--<th>Created</th>
+        </tr>
+    </thead>
+    <tbody data-bind="visible:$root.commandEditable.GUID() === '00000000-0000-0000-0000-000000000000'">
+        <tr>
+            <td>
+                <input type="checkbox" disabled />
+                <button disabled>Р</button>
+                <button data-bind="click: function(){ $root.CommandSave(      $root); }">С</button>
+                <button data-bind="click: function(){ $root.CommandCansel(    $root); }">О</button>
+            </td>
+            <td>00000000-0000-0000-0000-000000000000</td>
+            <td>
+                <input data-bind="visible: $root.time_represent() == 'fromBegin',       timespanValue: {begin: new Date(0) , end: $root.commandEditable.time }">
+                <input data-bind="visible: $root.time_represent() == 'fromPrevious',     timespanValue: {begin: new Date(0)  , end: $root.commandEditable.time }">
+            </td>
+            <td>
+                <select data-bind="options: $root.definitions,
+                optionsText: 'Title',
+                optionsValue: 'GUID',
+                value: $root.commandEditable.GUIDCommand_def"></select>
+            </td>
 
-                    <td data-bind="text: $root.commandEditable.Code"></td>
-                    <td data-bind="text: $root.commandEditable.ID"></td>
-                    <!--<td>
-                        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.dataRate" />
-                    </td>-->
-                    <!--<td>
-                        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.power" />
-                    </td>-->
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <textarea data-bind="value: $root.commandEditable.dataWord"></textarea>
-                    </td>
-                    <td data-bind="text:$root.commandEditable.Created, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
-                </tr>
-            </tbody>
-            <tbody data-bind="foreach:commands">
-                <tr>
-                    <td>
-                        <input type="checkbox" data-bind="checkedValue: GUID, checked: $root.commandsChecked" />
-                        <button data-bind="click: function(){ $root.CommandEdit($data,$root); }, enable: $data.GUID !== $root.commandEditable.GUID()">Р</button>
-                        <button data-bind="click: function(){ $root.CommandSave(      $root); }, enable: $data.GUID === $root.commandEditable.GUID()">С</button>
-                        <button data-bind="click: function(){ $root.CommandCansel(    $root); }, enable: $data.GUID === $root.commandEditable.GUID()">О</button>
-                    </td>
-                    <td data-bind="text:GUID"></td>
-                    <!--<td data-bind="text:GUIDCyclogram"></td>-->
-                    <td>
-                        <div data-bind="if:$data.GUID != $root.commandEditable.GUID()">
-                            <span data-bind="visible: $root.time_represent() == 'fromBegin',   text: $root.Tics2Str(time())"></span>
-                            <span data-bind="visible: $root.time_represent() == 'fromPrevious', text: $root.Tics2Str(($index() === 0) ? 0 : (time() - $root.commands()[$index() - 1].time()))"></span>
-                        </div>
-                        <div data-bind="if:$data.GUID == $root.commandEditable.GUID()">
-                            <input data-bind="visible: $root.time_represent() == 'fromBegin',       timespanValue: {begin: new Date(0) , end: $root.commandEditable.time }">
-                            <input data-bind="visible: $root.time_represent() == 'fromPrevious',       timespanValue: {begin: ($index() === 0) ? time : $root.commands()[$index() -1].time  , end: $root.commandEditable.time }">
-                        </div>
-                    </td>
-                    <td>
-                        <span data-bind="visible:$data.GUID !== $root.commandEditable.GUID(), text:Title"></span>
-                        <div data-bind="visible:$data.GUID === $root.commandEditable.GUID()">
-                            <select data-bind="options: $root.definitions,
-                        optionsText: 'Title',
-                        optionsValue: 'GUID',
-                        value: $root.commandEditable.GUIDCommand_def"></select>
-                        </div>
-                    </td>
+            <td data-bind="text: $root.commandEditable.Code"></td>
+            <td data-bind="text: $root.commandEditable.ID"></td>-->
+    <!--<td>
+        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.dataRate" />
+    </td>-->
+    <!--<td>
+        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.power" />
+    </td>-->
+    <!--<td></td>
+            <td></td>
+            <td>
+                <textarea data-bind="value: $root.commandEditable.dataWord"></textarea>
+            </td>
+            <td data-bind="text:$root.commandEditable.Created, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
+        </tr>
+    </tbody>
+    <tbody data-bind="foreach:commands">
+        <tr>
+            <td>
+                <input type="checkbox" data-bind="checkedValue: GUID, checked: $root.commandsChecked" />
+                <button data-bind="click: function(){ $root.CommandEdit($data,$root); }, enable: $data.GUID !== $root.commandEditable.GUID()">Р</button>
+                <button data-bind="click: function(){ $root.CommandSave(      $root); }, enable: $data.GUID === $root.commandEditable.GUID()">С</button>
+                <button data-bind="click: function(){ $root.CommandCansel(    $root); }, enable: $data.GUID === $root.commandEditable.GUID()">О</button>
+            </td>
+            <td data-bind="text:GUID"></td>-->
+    <!--<td data-bind="text:GUIDCyclogram"></td>-->
+    <!--<td>
+        <div data-bind="if:$data.GUID != $root.commandEditable.GUID()">
+            <span data-bind="visible: $root.time_represent() == 'fromBegin',   text: $root.Tics2Str(time())"></span>
+            <span data-bind="visible: $root.time_represent() == 'fromPrevious', text: $root.Tics2Str(($index() === 0) ? 0 : (time() - $root.commands()[$index() - 1].time()))"></span>
+        </div>
+        <div data-bind="if:$data.GUID == $root.commandEditable.GUID()">
+            <input data-bind="visible: $root.time_represent() == 'fromBegin',       timespanValue: {begin: new Date(0) , end: $root.commandEditable.time }">
+            <input data-bind="visible: $root.time_represent() == 'fromPrevious',       timespanValue: {begin: ($index() === 0) ? time : $root.commands()[$index() -1].time  , end: $root.commandEditable.time }">
+        </div>
+    </td>
+    <td>
+        <span data-bind="visible:$data.GUID !== $root.commandEditable.GUID(), text:Title"></span>
+        <div data-bind="visible:$data.GUID === $root.commandEditable.GUID()">
+            <select data-bind="options: $root.definitions,
+        optionsText: 'Title',
+        optionsValue: 'GUID',
+        value: $root.commandEditable.GUIDCommand_def"></select>
+        </div>
+    </td>
 
-                    <td>
-                        <span data-bind="visible:$data.GUID !== $root.commandEditable.GUID(), text:Code"></span>
-                        <span data-bind="visible:$data.GUID === $root.commandEditable.GUID(), text:$root.commandEditable.Code"></span>
-                    </td>
-                    <td>
-                        <span data-bind="visible:$data.GUID !== $root.commandEditable.GUID(), text:ID"></span>
-                        <span data-bind="visible:$data.GUID === $root.commandEditable.GUID(), text:$root.commandEditable.ID"></span>
-                    </td>
-                    <td data-bind="text:SendingTime, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
-                    <td data-bind="text:Status"></td>
-                    <!--<td data-bind="text:Title"></td>-->
-                    <td>
-                        <span data-bind="visible:$data.GUID != $root.commandEditable.GUID(), text:dataWord"></span>
-                        <textarea data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.dataWord"></textarea>
-                    </td>
-                    <!--<td>
-                        <span data-bind="visible:$data.GUID != $root.commandEditable.GUID(), text:dataRate"></span>
-                        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.dataRate" />
-                    </td>-->
-                    <!--<td>
-                        <span data-bind="visible:$data.GUID != $root.commandEditable.GUID(), text:power"></span>
-                        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.power" />
-                    </td>-->
-                    <td data-bind="text:Created, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
+    <td>
+        <span data-bind="visible:$data.GUID !== $root.commandEditable.GUID(), text:Code"></span>
+        <span data-bind="visible:$data.GUID === $root.commandEditable.GUID(), text:$root.commandEditable.Code"></span>
+    </td>
+    <td>
+        <span data-bind="visible:$data.GUID !== $root.commandEditable.GUID(), text:ID"></span>
+        <span data-bind="visible:$data.GUID === $root.commandEditable.GUID(), text:$root.commandEditable.ID"></span>
+    </td>
+    <td data-bind="text:SendingTime, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
+    <td data-bind="text:Status"></td>-->
+    <!--<td data-bind="text:Title"></td>-->
+    <!--<td>
+        <span data-bind="visible:$data.GUID != $root.commandEditable.GUID(), text:dataWord"></span>
+        <textarea data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.dataWord"></textarea>
+    </td>-->
+    <!--<td>
+        <span data-bind="visible:$data.GUID != $root.commandEditable.GUID(), text:dataRate"></span>
+        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.dataRate" />
+    </td>-->
+    <!--<td>
+        <span data-bind="visible:$data.GUID != $root.commandEditable.GUID(), text:power"></span>
+        <input type="number" min="0" max="100000" data-bind="visible:$data.GUID == $root.commandEditable.GUID(), value: $root.commandEditable.power" />
+    </td>-->
+    <!--<td data-bind="text:Created, format: 'UTC: yyyy-mm-dd HH:MM:ss'"></td>
                 </tr>
             </tbody>
         </table>
+    </div>-->
+
+
+    <div data-bind="if: isTimeLineVisible">
+        <div data-bind="component: { name: 'timeline', params: timeLineOptions }">
+        </div>
     </div>
 
-
-
-    <!--<div data-bind="component: { name: 'timeline', params: timeLineOptions }"></div>-->
-    <div data-bind="component: { name: 'timeline', params: timeLineOptions }">
-        <!--<table class="timeline_root">
-            <tbody class="timeline_panel">
-                <tr>
-                    <td></td>
-                    <td class="timeline_legend_panel">
-                        <div class="timeline_legend_item" style="text-decoration: none;">
-                            <span style="color: #3366CC;">●</span>Q1
-                        </div>
-                        <div class="timeline_legend_item" style="text-decoration: none;">
-                            <span style="color: #DC3912;">●</span>ГАЛС
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="timeline_axis_panel"></td>
-                    <td class="timeline_canvas_panel" style="height: 150px;"><div style="width: 2540px; height: 150px;" class="timeline_grid">
-                        <div class="timeline_scale_grid timeline_scale_major" style="left: 0px;"></div>
-                        <div class="timeline_scale_grid timeline_scale_minor" style="left: 42.35px;"></div>
-                        <div class="timeline_scale_grid timeline_scale_minor" style="left: 84.7px;"></div>
-                        <div class="timeline_scale_grid timeline_scale_minor" style="left: 127.05px;"></div>
-                        <canvas class="timeline_canvas" width="2540" height="150"></canvas>
-                    </td>
-                </tr>
-            </tbody>
-        </table>-->
-    </div>
-
-    <!--<div data-bind="component: { name: 'timeline' } "></div>-->
-
-
-        <!--<div data-bind="foreach: instruments">
-            <span data-bind="text: Title"></span>
-        </div>-->
-
-        <script>
-            IndexViewModel = new rlab.nkpori.CyclogramModel();
-            ko.applyBindings(IndexViewModel);
-        </script>
+    <script>
+        IndexViewModel = new rlab.nkpori.CyclogramModel();
+        ko.applyBindings(IndexViewModel);
+    </script>
 </body>
 </html>

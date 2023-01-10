@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1209
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32630.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ion-nnk-state-machine", "ion-nnk-state-machine.csproj", "{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ion-nnk-state-mnemonic", "ion-nnk-state-mnemonic.csproj", "{2574F603-4B6C-4A30-BFDD-E3BC09EEDFDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,14 +21,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D18E6B4B-350A-4AF3-82D4-BFE6C4CE1C8A}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tfs.rlab.iki.rssi.ru/tfs/rlab
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = ion-nnk-state-machine\\ion-nnk-state-machine.csproj
-		SccProjectName1 = ion-nnk-state-machine
-		SccLocalPath1 = ion-nnk-state-machine
 	EndGlobalSection
 EndGlobal

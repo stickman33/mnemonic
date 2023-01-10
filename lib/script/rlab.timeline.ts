@@ -1538,7 +1538,7 @@ namespace rlab.knockout {
                                 }
 
                                 timeline.panels[indxP].fields = __fields;
-                                console.log(timeline.panels[indxP].fields)
+                                //console.log(timeline.panels[indxP].fields)
                                 timeline.Draw("field_array");
                             });
 
