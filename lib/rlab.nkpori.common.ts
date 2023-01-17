@@ -29,9 +29,4 @@
 
     }
 
-        //export interface Instrument{
-    //    GUID: string,
-    //    SecurityGroup: string;
-    //    Title: string;
-    //}
 }

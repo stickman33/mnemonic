@@ -119,6 +119,7 @@
     <TypeScriptCompile Include="lib\rlab.nkpori.common.ts" />
     <TypeScriptCompile Include="lib\rlab.nkpori.config.ts" />
     <TypeScriptCompile Include="lib\script\rlab.knockout.textFormat.ts" />
+    <TypeScriptCompile Include="lib\script\rlab.mnemonic.ts" />
     <TypeScriptCompile Include="lib\script\rlab.services.ts" />
     <TypeScriptCompile Include="lib\script\rlab.timeline.ts" />
     <TypeScriptCompile Include="lib\typing\knockout.d.ts" />

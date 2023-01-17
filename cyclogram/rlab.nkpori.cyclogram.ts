@@ -19,38 +19,18 @@ namespace rlab.nkpori {
         begin: Date
     }
 
-    interface CommandEditable {
-        GUID: ko.Observable<string>,
-        GUIDCommand_def: ko.Observable<string>,
-        GUIDCyclogram: ko.Observable<string>,
-        Created: ko.Observable<Date>,
-        Code: ko.Observable<string>,
-        ID: ko.Observable<string>,
-        //SendingTime: ko.Observable<Date>,
-        //Status: ko.Observable<string>,
-        //Title: ko.Observable<string>,
-        //dataRate: ko.Observable<string>,
-        dataWord: ko.Observable<string>,
-        //power: ko.Observable<string>,
-        time: ko.Observable<number>
+    interface State {
+        GUID: string,
+        GUIDInstrument: string,
+        Title: string
     }
 
-    interface CyclogramEditable {
-        GUID: ko.Observable<string>,
-        Created: ko.Observable<Date>,
-        Modified: ko.Observable<Date>,
-        SIPID: ko.Observable<number>,
-        comment: ko.Observable<string>,
-        Type: ko.Observable<string>,
-        StartTime: ko.Observable<Date>
-    }
 
     interface Instrument {
-        GUID: ko.Observable<string>,
-        SecurityGroup: ko.Observable<string>,
-        Title: ko.Observable <string>
+        GUID: string,
+        SecurityGroup: string,
+        Title: string
     }
-
 
   
 
@@ -63,141 +43,53 @@ namespace rlab.nkpori {
 
         dateLimitParams: ko.Observable<{ begin: ko.Observable<Date>, end: ko.Observable<Date> }>;
         timeLineOptions: any;
+
         isTimeLineVisible: ko.Observable<boolean> = ko.observable(false);
+        isSVGvisible: ko.Observable<boolean> = ko.observable(false);
 
 
         definitions: ko.ObservableArray<CommandDef>;
-
         cyclograms: ko.ObservableArray<Cyclogram>;
-
         instruments: ko.ObservableArray<Instrument>;
-
         selectedCyclogramGUID: ko.Observable<string>;
-        cyclogramEditable: CyclogramEditable;
-
         commands: ko.ObservableArray<Command>;
-
-        comandsCGGuid: ko.Observable<string>;
-        commandsChecked: ko.ObservableArray<string>;
-        isAllCommandsCheck: ko.PureComputed<boolean>;
-        isAllCommandsIndeterminate: ko.PureComputed<boolean>;
-
-        commandEditable: CommandEditable;
-
-
-        time_represent: ko.Observable<string>;
-        time_cascade: ko.Observable<string>;
 
         cycTablePage = 1;
 
         backButton = document.getElementById("back") as HTMLButtonElement;
         nextButton = document.getElementById("next") as HTMLButtonElement;
 
+        mnemoSquares: ko.ObservableArray<Square>;
 
+        states: Array<State>;
+
+        intervals: {};
+
+
+        
 
         constructor(params: any) {
-            
+
             this.subscriptions = [];
             this.timers = [];
 
-            this.spaceCraft = ko.observable(SCs[0].key);
 
+            //let m: Circle = { css: ko.observable("grey") };
+            //let i: Square[] = [{ GUID: "", Title: "PES", Circle: m, fill: ko.observable("#a8c6f7"), stroke: ko.observable("black"), x: 0, y: 0, position: `translate(${40},${80})`, text: ko.observable("status") }];
+
+            this.mnemoSquares = ko.observableArray([]);
+
+            this.states = [];
+            
+
+            this.intervals = {};
+
+            //this.spaceCraft = ko.observable(SCs[0].key);
             this.definitions = ko.observableArray([]);
-
             this.instruments = ko.observableArray([]);
-
             this.cyclograms = ko.observableArray([]);
             this.selectedCyclogramGUID = ko.observable(null);
-            this.cyclogramEditable = {
-                GUID: ko.observable(""),
-                Created: ko.observable(new Date("0001-01-01T00:00:00.000Z")),
-                Modified: ko.observable(new Date("0001-01-01T00:00:00.000Z")),
-                SIPID: ko.observable(-1),
-                comment: ko.observable(""),
-                Type: ko.observable(""),
-                StartTime: ko.observable(null)
-            }
-
-            
             this.commands = ko.observableArray([]);
-            this.isAllCommandsCheck = ko.pureComputed({
-                read: function () {
-                    let isAll: boolean = true;
-                    if (this.commands().length == 0)
-                        return false;
-                    /// check is all children is checked ??
-                    this.commands().forEach(ch => isAll = isAll && (this.commandsChecked().indexOf(ch.GUID) >= 0))
-                    return isAll;
-                },
-                write: function (value) {
-                    /// add / remove  all children into checked array
-                    if (this.commands().length > 0)
-                        if (value)
-                            this.commands().forEach(ch => {
-                                if (this.commandsChecked().indexOf(ch.GUID) == -1)
-                                    this.commandsChecked.push(ch.GUID);
-                            })
-                        else
-                            this.commands().forEach(ch => { this.commandsChecked.remove(ch.GUID); })
-
-                },
-                owner: this
-            });
-            this.isAllCommandsIndeterminate = ko.computed(function () {
-                let cnt = 0;
-
-                this.commands().forEach(ch => {
-                    if (this.commandsChecked().indexOf(ch.GUID) >= 0)
-                        cnt++;
-                })
-
-                return cnt > 0 && cnt < this.commands().length;
-            }, this);
-
-
-            this.comandsCGGuid = ko.observable<string>("");
-
-            
-
-
-            this.commandsChecked = ko.observableArray([]);
-    
-
-            this.time_represent = ko.observable(TimeRepresentType[0].key);
-            this.time_cascade = ko.observable(TimeCascadeType[0].key);
-
-            this.commandEditable = {
-                GUID: ko.observable(""),
-                GUIDCommand_def: ko.observable(""),
-                GUIDCyclogram: ko.observable(""),
-                //Code: ko.observable (""),
-                Created: ko.observable(new Date("0001-01-01T00:00:00.000Z")),
-                ID: ko.observable(""),
-                Code: ko.observable(""),
-                //SendingTime: ko.observable(new Date("0001-01-01T00:00:00.000Z")),
-                //Status: ko.observable (""),
-                //Title: ko.observable (""),
-                //dataRate: ko.observable (""),
-                dataWord: ko.observable (""),
-                //power: ko.observable (""),
-                time: ko.observable(-1)
-            }
-
-
-
-            //this.subscriptions.push(this.commandEditable.GUIDCommand_def.subscribe(nv => {
-            //    if (nv !== "") {
-            //        this.definitions().forEach(def => {
-            //            if (def.GUID === nv) {
-            //                this.commandEditable.Code(def.Code);
-            //                this.commandEditable.ID(def.ID);
-            //            }
-            //        })
-            //    }
-            //}, this))
-
-            
-
 
 
             this.dateLimitParams = ko.observable({
@@ -205,29 +97,6 @@ namespace rlab.nkpori {
                 end: ko.observable(new Date(10 * 60 * 1000))
             });
 
-            //let timeLineCatregories = [];
-            //Instr.forEach(instr => timeLineCatregories.push(
-            //    { title: instr.title, field: instr.key + "_value", style: "event", width: 2 }
-            //));
-
-            
-            //let timeLineCatregories = [];
-
-
-            //this.instruments().forEach(instr => timeLineCatregories.push({ title: instr.Title, style: "event", width: 2 }));
-            //timeLineCatregories.push({ title: "2132131", style: "event", width: 2 });
-
-            
-     
-
-
-            
-            //fetch('/0/services/Sequences.svc/instrument')
-            //.then(response => response.text())
-            //.then(str => (new DOMParser()).parseFromString(str, "text/xml"))
-            //.then(data => data);
-
-            
 
             this.timeLineOptions = {
                 data: this.commands,
@@ -240,51 +109,50 @@ namespace rlab.nkpori {
                 isSelectItems: ko.observable(false),
                 isSelectTime: ko.observable(false),
                 panels: [
-                   
                     {
                         min: -1,
                         max: 2,
                         isAxis: false,
-                        fields: []
+                        fields: [],
+                        isScale: false
                         //IsVisible: false
+                    },
+                    {
+                        //min: -1,
+                        //max: 2,
+                        isAxis: false,
+                        fields: []
                     }
                 ],
                 selectedItems: ko.observableArray([]),
-                selectedTime: ko.observable()
+                selectedTime: ko.observable(new Date(0))
             };
+
+
 
             this.backButton.disabled = true;
 
 
-            //this.timeLineOptions.panels[0].fields.valueHasMutated();
-            //console.log(this.timeLineOptions.panels[0].fields);
+            //this.subscriptions.push(this.spaceCraft.subscribe(newValue => {
 
+            //    this.GetCyclogram(this.cycTablePage);
+            //}, this));
 
-            //this.timeLineOptions.panels[0].IsVisible = false;
-            //console.log(this.instruments());
-            //console.log("IsVisible: " + this.timeLineOptions.panels[0].IsVisible);
-            //console.log(this.instruments().length);
-
-
-            //console.log(this.timeLineCatregories);
+            //this.subscriptions.push(this.timeLineOptions.selectedTime.subscribe(newValue => {
+            //    //this.GetIntervals(this.selectedCyclogramGUID());
+            //    this.updSVGSquares();
+            //}, this));
 
             
-            
-
-            this.subscriptions.push(this.spaceCraft.subscribe(newValue => {
-    
-                this.GetCyclogram(this.cycTablePage);
-            }, this));
-
-
             console.log("CyclogramModel: constructed");
 
             this.GetInstruments();
             this.GetCommandDefinition();
             this.GetCyclogram(this.cycTablePage);
+            this.timeLineOptions;
+            this.GetStates();
 
         }
-
 
         dispose() {
             while (this.timers.length > 0) {
@@ -297,13 +165,243 @@ namespace rlab.nkpori {
         }
 
         ShowCyclogramContent(self: CyclogramModel) {
-
+            self.dispose();
             let cyc = self.FindCyclogramByGUID(self);
-
-            //self.comandsCGGuid(cyc.GUID);
             self.CommandsGet(cyc.GUID);
+            self.timeLineOptions.selectedTime(new Date(0));
+            self.GetIntervals(cyc.GUID);
+
+            if (!self.timeLineOptions.isZoom()) {
+                self.timeLineOptions.isZoom(true);
+
+            }
+
+            if (!self.isSVGvisible()) {
+                self.isSVGvisible(true);
+            }
+
+
+            this.subscriptions.push(this.timeLineOptions.selectedTime.subscribe(newValue => {
+                this.updSVGSquares();
+            }, this));
         }
 
+
+
+
+
+        buildSVGSquares() {
+            let self = this;
+            let sqaures = [];
+            let countX = 40;
+            let countY = 80;
+            let countSquare = 0;
+
+            self.instruments().forEach(instr => {
+                //let circle: Circle = { css: ko.observable("grey") };
+                
+                let square: Square = ({
+                    GUID: instr.GUID.toString(),
+                    Title: instr.Title.toString(),
+                    Circle: { css: ko.observable("grey") },
+                    fill: ko.observable("grey"),
+                    stroke: ko.observable("black"),
+                    position: `translate(${countX},${countY})`,
+                    text: ko.observable("None")
+                });
+                sqaures.push(square);
+
+                if (countSquare < 3) {
+                    countY = countY + 100;
+                    countSquare++;
+
+                }
+                else {
+                    countX = countX + 200;
+                    countY = 80;
+                    countSquare = 0;
+                }
+
+            });
+            self.mnemoSquares(sqaures);
+        }
+
+        //GetIntervals(guid: string) {
+        //    let self = this;
+
+        //    rlab.services.Request({
+        //        url: `/0/services/StateMachine.svc/CalculationNI?sequence=${guid}`,
+        //        //request: {
+        //        //    spacecraft: self.spaceCraft(),
+        //        //},
+        //        type: "GET",
+        //        contentType: "application/json",
+        //        success: function (data: any[]) {
+        //            let tmp_data: interval[] = [];
+        //            data.forEach(instr => {
+        //                tmp_data.push(instr.Value);
+        //                //console.log(instr.Key);
+        //                //console.log(instr.Value);
+        //            });
+
+        //            self.intervals = tmp_data;
+        //            console.log(new Date(self.intervals[0][0].startOffset * 1000));
+        //            console.log(new Date(self.intervals[0][0].stopOffset * 1000));
+
+        //        },
+        //        error: function (data) {
+        //            console.log("Ошибка");
+        //        }
+        //    });
+        //}
+
+
+        GetStates() {
+            let self = this;
+
+            rlab.services.Request({
+                url: "/0/services/StateMachine.svc/state",
+                //request: {
+                //    spacecraft: self.spaceCraft(),
+                //},
+                type: "GET",
+                contentType: "application/json",
+                success: function (data: any[]) {
+                    let tmp_data: State[] = [];
+                    data.forEach(state => {
+                        tmp_data.push({
+                            GUID: state.GUID,
+                            GUIDInstrument: state.GUIDInstrument,
+                            Title: state.Title
+
+                        });
+                    });
+
+                    self.states = tmp_data;
+                    //console.log(self.definitions());
+
+                    console.log("список состояний загружен");
+                }
+            });
+        }
+
+        updSVGSquares() {
+            let self = this;
+
+            for (var key in self.intervals) {
+                var value = self.intervals[key];
+
+                //var selectedTime = 254;
+                var selectedTime = self.timeLineOptions.selectedTime() / 1000;
+
+
+                //console.log("Instrument GUID: " + key);
+                value.forEach(val => {
+                    if (selectedTime > val.startOffset && selectedTime < val.stopOffset) {
+                        self.states.forEach(state => {
+                            if (val.GUIDState == state.GUID) {
+                                //console.log("State: " + state.Title);
+                                self.mnemoSquares().forEach(square => {
+                                    if (square.GUID == state.GUIDInstrument) {
+                                        square.text(state.Title);
+                                        if (state.Title == "Выключен" || state.Title == null) {
+                                            square.fill("grey");
+                                        }
+                                        else {
+                                            square.fill("#a8c6f7");
+                                        }
+
+                                        if (val.GUIDState == "2e85bad5-6a49-ed11-8edc-00155d09ea1d") {
+                                            square.Circle.css("lightgreen");
+                                        }
+                                        else {
+                                            square.Circle.css("grey");
+                                        }
+
+                                    }
+                                });
+                            }
+                        });
+
+                    }
+
+                });
+            }
+        }
+
+
+        updTimeLine() {
+            let self = this;
+            let count = 1;
+
+
+
+            for (var key in self.intervals) {
+                var value = self.intervals[key];
+                //value.forEach(val => {
+                self.timeLineOptions.panels[1].fields.forEach(instr => {
+                    if (key == instr.guidInstr) {
+                        //instr.data = { begin: new Date(), end: new Date(), value: count + 1 };
+                        if (value.length > 1) { 
+                            let startOffset = value[0].stopOffset;
+                            let stopOffset = value[value.length - 2].stopOffset;
+
+                            instr.data.push({ begin: new Date(startOffset * 1000), end: new Date(stopOffset * 1000), value: count + 1 });
+                        }
+                        else {
+                            instr.data.removeAll();
+                        }
+                    }
+                        
+                });
+                count++;
+
+                //});
+
+            }
+            self.dateLimitParams.valueHasMutated();
+
+            //self.dataArray.push({ begin: new Date(1), end: new Date(50000), value: 1 });
+
+        }
+
+        GetIntervals(guid: string) {
+            let self = this;
+
+            rlab.services.Request({
+                url: `/0/services/StateMachine.svc/CalculationNI?sequence=${guid}`,
+                //request: {
+                //    spacecraft: self.spaceCraft(),
+                //},
+                type: "GET",
+                contentType: "application/json",
+                success: function (data: any[]) {
+                    //let tmp_dict: {};
+                    let tmp_intervals: interval[] = [];
+                    data.forEach(instr => {
+                        tmp_intervals = instr.Value;
+                        self.intervals[instr.Key] = tmp_intervals;
+
+                        //console.log(tmp_intervals);
+                        //console.log(tmp_dict);
+                        //console.log(instr.Key);
+                        //console.log(instr.Value);
+                    });
+                    self.buildSVGSquares();
+                    self.updSVGSquares();
+                    self.updTimeLine();
+
+
+                    //self.intervals = tmp_dict;
+                    //console.log(new Date(self.intervals[0][0].startOffset * 1000));
+                    //console.log(new Date(self.intervals[0][0].stopOffset * 1000));
+                    
+                },
+                error: function (data) {
+                    console.log("Ошибка");
+                }
+            });
+        }
 
         GetCommandDefinition() {
             let self = this;
@@ -330,11 +428,11 @@ namespace rlab.nkpori {
                     self.definitions(tmp_data);
                     //console.log(self.definitions());
                     
-                    console.log("список определений комманд загружен");
+                    console.log("список определений команд загружен");
                 },
                 error: function (data) {
                     self.cyclograms([]);
-                    console.log("Ошибка загрузки списка определений комманд");
+                    console.log("Ошибка загрузки списка определений команд");
                 }
             });
         }
@@ -344,8 +442,6 @@ namespace rlab.nkpori {
         
         }
 
-        
-    
 
         nextCyclogramPage() {
             this.cycTablePage++;
@@ -354,7 +450,7 @@ namespace rlab.nkpori {
             }
             this.backButton.disabled = false;
             this.GetCyclogram(this.cycTablePage);
-            console.log(this.cycTablePage);
+            //console.log(this.cycTablePage);
             
         }
         
@@ -366,7 +462,7 @@ namespace rlab.nkpori {
             }
             this.nextButton.disabled = false;
             this.GetCyclogram(this.cycTablePage);
-            console.log(this.cycTablePage);
+            //console.log(this.cycTablePage);
         }
 
         GetCyclogram(page) {
@@ -427,14 +523,24 @@ namespace rlab.nkpori {
                             Title: instr.Title,
                         }
                          self.timeLineOptions.panels[0].fields.push({ title: item.Title, field: item.SecurityGroup + "_value", style: "event", width: 2 });
+                         self.timeLineOptions.panels[1].fields.push({ title: item.Title, field: "value", style: "segment", width: 10, data: ko.observableArray([]), guidInstr: item.GUID });
+                         //self.timeLineOptions.panels[1].fields.push({ title: item.Title, field: "value", style: "segment", width: 5 });
+
                          self.instruments.push(item);
                      });
+
 
                     self.dateLimitParams.valueHasMutated();
                     self.isTimeLineVisible(true);
                     console.log("список приборов загружен");
                     //console.log(self.instruments());
-                   
+
+                    self.instruments().forEach(instr => {
+                        self.intervals[instr.GUID] = {};
+                    });
+
+                    //self.buildSVGSquares();
+                    console.log("приборы на мнемосхеме построены");
                 },
 
                 error: function (data) {
@@ -445,7 +551,7 @@ namespace rlab.nkpori {
             });
         }
 
-
+        
         
 
         CommandsGet(guid: string) {
@@ -497,259 +603,29 @@ namespace rlab.nkpori {
                         tmp_data.push(item);
                     });
 
+                    self.timeLineOptions.isSelectTime(true);
+                    self.dateLimitParams().begin(new Date(-1 * 1000 * 30));
                     self.dateLimitParams().end(new Date(tmp_data[tmp_data.length - 1].Offset() * 1.2));
-                    self.dateLimitParams.valueHasMutated();
                     self.commands(tmp_data);
-                    console.log("список комманд загружен");
+                    //self.timeLineOptions.panels[1].data.push({ "iosph0-instr-pes_value1": "Режим 1", "begin": new Date(0), "end": new Date(50000) });
+
+                    self.dateLimitParams.valueHasMutated();
+                    console.log("список команд загружен");
+
+
+
+
+                    //console.log(self.dateLimitParams().end());
                     //console.log(self.commands());
 
                 },
                 error: function (data) {
                     self.cyclograms([]);
-                    console.log("Ошибка загрузки списка комманд");
+                    console.log("Ошибка загрузки списка команд");
                 }
             });
         }
 
-
-
-        //CommandsDelete(self: CyclogramModel) {
-
-        //    let elems = self.commands().filter(e =>  self.commandsChecked().filter(ch =>   e.GUID === ch ).length == 0);
-        //    self.commandsChecked([]);
-        //    self.commands(elems);
-
-
-        //}
-
-        //ComandsPost(self: CyclogramModel) {
-
-        //    let requestData = [];
-
-        //    self.commands().forEach(cmd => requestData.push({
-        //        //Code: String content,
-        //        //Created: String content,
-        //        GUID: cmd.GUID,
-        //        GUIDCommand_def: cmd.GUIDCommand_def,
-        //        GUIDCyclogram: cmd.GUIDCyclogram,
-        //        ID: cmd.ID,
-        //        Code: cmd.Code,
-        //        //SendingTime: String content,
-        //        //Status: String content,
-        //        //Title: String content,
-        //        //dataRate: cmd.dataRate,
-        //        dataWord: cmd.dataWord,
-        //        //power: cmd.power,
-        //        time: cmd.time()/1000 /// convert tics to seconds
-        //    }));
-
-        //    rlab.services.Request({
-        //        url: "/services/Planning.svc/command?spacecraft=" + self.spaceCraft()+"&guidCyclogram=" + self.comandsCGGuid(),
-        //        request: JSON.stringify(requestData), 
-        //        type: "POST",
-        //        contentType: "application/json",
-        //        success: function (data: any[]) {
-                    
-
-                   
-        //            console.log("список комманд обновлён");
-        //            self.CommandsGet(self.comandsCGGuid());
-        //        },
-        //        error: function (data) {
-        //            self.cyclograms([]);
-        //            console.log("Ошибка обновления списка комманд");
-        //        }
-        //    });
-        //}
-
-        //CommandsClear() {
-        //    let self = this;
-        //    self.commands([]);
-        //}
-
-
-
-
-
-        //CommandEdit(cmd: Command, self: CyclogramModel): void {
-        //    //self.commandEditable.Code(cmd.Code);
-        //    self.commandEditable.Created(cmd.Created);
-        //    self.commandEditable.GUID(cmd.GUID);
-        //    self.commandEditable.GUIDCommand_def(cmd.GUIDCommand_def);
-        //    self.commandEditable.GUIDCyclogram(cmd.GUIDCyclogram);
-        //    self.commandEditable.ID(cmd.ID);
-        //    self.commandEditable.Code(cmd.Code);
-        //    //self.commandEditable.SendingTime(cmd.SendingTime);
-        //    //self.commandEditable.Status(cmd.Status);
-        //    //self.commandEditable.Title(cmd.Title);
-        //    //self.commandEditable.dataRate(cmd.dataRate);
-        //    self.commandEditable.dataWord(cmd.dataWord);
-        //    //self.commandEditable.power(cmd.power);
-        //    self.commandEditable.time(cmd.time());
-        //}
-
-        //CommandAdd(self: CyclogramModel):void {
-        //    self.commandEditable.GUID("00000000-0000-0000-0000-000000000000");
-        //    self.commandEditable.GUIDCommand_def(self.definitions()[0].GUID);
-        //    self.commandEditable.GUIDCyclogram(self.comandsCGGuid());
-        //    self.commandEditable.Created(new Date());
-
-
-        //    self.commandEditable.Code(self.definitions()[0].Code);
-        //    self.commandEditable.ID(self.definitions()[0].ID);
-
-        //    //self.commandEditable.dataRate(self.definitions()[0].dataRate);
-        //    self.commandEditable.dataWord(self.definitions()[0].dataWord);
-        //    //self.commandEditable.power(self.definitions()[0].power);
-        //    self.commandEditable.time(0);
-        //}
-
-        //CommandCansel(self: CyclogramModel): void {
-        //    //self.commandEditable.Code("");
-        //    self.commandEditable.Created(new Date("0001-01-01T00:00:00.000Z"));
-        //    self.commandEditable.GUID("");
-        //    self.commandEditable.GUIDCommand_def("");
-        //    self.commandEditable.GUIDCyclogram("");
-        //    self.commandEditable.ID("");
-        //    self.commandEditable.Code("");
-        //    //self.commandEditable.SendingTime(new Date("0001-01-01T00:00:00.000Z"));
-        //    //self.commandEditable.Status("");
-        //    //self.commandEditable.Title("");
-        //    //self.commandEditable.dataRate("");
-        //    self.commandEditable.dataWord("");
-        //    //self.commandEditable.power("");
-        //    self.commandEditable.time(-1);
-        //}
-
-        //CommandSave(self: CyclogramModel) {
-
-        //    let command_new: Command = {
-        //        GUID: self.commandEditable.GUID(),
-        //        GUIDCommand_def: self.commandEditable.GUIDCommand_def(),
-        //        GUIDCyclogram: self.commandEditable.GUIDCyclogram(),
-        //        Created: new Date(),
-        //        Code: self.commandEditable.Code(),
-        //        ID: self.commandEditable.ID(),
-        //        //dataRate: self.commandEditable.dataRate(),
-        //        dataWord: self.commandEditable.dataWord(),
-        //        //power: self.commandEditable.power(),
-        //        time: ko.observable(self.commandEditable.time()),
-
-        //        SendingTime: null,
-        //        Status: null,
-
-        //        begin: new Date(self.commandEditable.time()),
-        //        Title: ""
-        //    }
-
-        //    ///get title from definition
-        //    let def = self.definitions().filter(def => (def.GUID === command_new.GUIDCommand_def) )[0]
-
-        //    command_new.Title = def.Title;
-
-        //    /// try to find editable item
-        //    let try_to_find: Command[] = self.commands().filter((cmd) => (cmd.GUID === command_new.GUID))
-
-        //    if (try_to_find.length > 0) {
-        //        ///command exsist, replace and time cascades
-        //        self.commands.replace(try_to_find[0], command_new);
-        //        switch (self.time_cascade()) {
-        //            case "up":
-        //                {
-        //                    let index: number = self.commands.indexOf(command_new);
-        //                    let tics: number = command_new.time() - try_to_find[0].time();
-        //                    for (let iii = 0; iii < index; iii++) {
-        //                        self.commands()[iii].time(self.commands()[iii].time() + tics);
-        //                        self.commands()[iii].begin = new Date(self.commands()[iii].time());
-        //                    }
-        //                }
-        //                break;
-
-        //            case "down":
-        //                {
-        //                    let index: number = self.commands.indexOf(command_new);
-        //                    let tics: number = command_new.time() - try_to_find[0].time();
-        //                    for (let iii = index + 1; iii < self.commands().length; iii++) {
-        //                        self.commands()[iii].time(self.commands()[iii].time() + tics);
-        //                        self.commands()[iii].begin = new Date(self.commands()[iii].time());
-        //                    }
-        //                }
-        //                break;
-
-        //            case "selected":
-        //                {
-        //                    let tics: number = command_new.time() - try_to_find[0].time();
-        //                    for (let iii = 0; iii < self.commands().length; iii++) {
-        //                        if (self.commandsChecked().indexOf(self.commands()[iii].GUID) >=0 && self.commands()[iii].GUID !== command_new.GUID) {
-        //                            self.commands()[iii].time(self.commands()[iii].time() + tics);
-        //                            self.commands()[iii].begin = new Date(self.commands()[iii].time());
-        //                        }
-        //                    }
-        //                }
-        //                break;
-        //        }
-
-        //    }
-        //    else {
-        //        /// command not exsist, push 
-        //        command_new.GUID = self.uuidv4();
-        //        self.commands().push(command_new);
-        //    }
-
-
-        //    self.CommandCansel(self);
-        //    self.commands(self.commands().sort((a, b) => a.time() - b.time()));
-        //    self.commands.valueHasMutated();
-
-
-        //}
-
-        
-        //Tics2Str(tics: number): string {
-        //    let newValue = '';
-        //    let isPositive = tics >= 0;
-        //    if (!isPositive)
-        //        tics = -tics;
-        //    ///milliseconds
-        //    newValue = ((tics % 1000) == 0) ? '' : '.' + ('000' + tics % 1000).substr(-3);
-        //    tics = Math.floor(tics / 1000);
-        //    /// seconds
-        //    newValue = (((tics % 60 == 0) && (newValue.length == 0)) ? ':00' : ':' + ('00' + tics % 60).substr(-2)) + newValue;
-        //    tics = Math.floor(tics / 60);
-        //    /// minutes
-        //    newValue = ':' + ('0' + tics % 60).substr(-2) + newValue;
-        //    tics = Math.floor(tics / 60);
-        //    /// hours
-        //    newValue = ('0' + tics % 24).substr(-2) + newValue;
-        //    /// days
-        //    newValue = ((Math.floor(tics / 24) == 0) ? '' : Math.floor(tics / 24) + '.') + newValue;
-
-        //    if (!isPositive)
-        //        newValue = "-" + newValue
-        //    return newValue;
-        //}
-
-        //Tics2begin(cmd: Command, root: CyclogramModel) {
-        //    return root.Tics2Str(cmd.time());
-        //}
-
-
-
-        //Tics2prev(cmd: Command, root: CyclogramModel) {
-        //    let i: number = root.commands().indexOf(cmd);
-        //    if (i == 0)
-        //        return root.Tics2Str(0);
-        //    else {
-        //        let t = (cmd.time() - root.commands()[i - 1].time());
-        //        return root.Tics2Str(t);
-        //    }
-        //}
-
-        uuidv4() {
-            return (1e7 + '-' + 1e3 + '-' + 4e3 + '-' + 8e3 + '-' + 1e11).replace(/[018]/g, c =>
-                (<any>c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> <any>c / 4).toString(16)
-            );
-        }
     }
     
 }
