@@ -45,7 +45,7 @@ namespace rlab.nkpori {
         timeLineOptions: any;
 
         isTimeLineVisible: ko.Observable<boolean> = ko.observable(false);
-        isSVGvisible: ko.Observable<boolean> = ko.observable(false);
+        isSVGvisible: ko.Observable<boolean> = ko.observable(true);
 
 
         definitions: ko.ObservableArray<CommandDef>;
@@ -56,8 +56,8 @@ namespace rlab.nkpori {
 
         cycTablePage = 1;
 
-        backButton = document.getElementById("back") as HTMLButtonElement;
-        nextButton = document.getElementById("next") as HTMLButtonElement;
+        //backButton = document.getElementById("back") as HTMLButtonElement;
+        //nextButton = document.getElementById("next") as HTMLButtonElement;
 
         mnemoSquares: ko.ObservableArray<Square>;
 
@@ -120,6 +120,7 @@ namespace rlab.nkpori {
                     {
                         //min: -1,
                         //max: 2,
+                        height: 200,
                         isAxis: false,
                         fields: []
                     }
@@ -130,7 +131,7 @@ namespace rlab.nkpori {
 
 
 
-            this.backButton.disabled = true;
+            //this.backButton.disabled = true;
 
 
             //this.subscriptions.push(this.spaceCraft.subscribe(newValue => {
@@ -148,7 +149,7 @@ namespace rlab.nkpori {
 
             this.GetInstruments();
             this.GetCommandDefinition();
-            this.GetCyclogram(this.cycTablePage);
+            //this.GetCyclogram(this.cycTablePage);
             this.timeLineOptions;
             this.GetStates();
 
@@ -166,10 +167,12 @@ namespace rlab.nkpori {
 
         ShowCyclogramContent(self: CyclogramModel) {
             self.dispose();
-            let cyc = self.FindCyclogramByGUID(self);
-            self.CommandsGet(cyc.GUID);
+            let GUID = self.selectedCyclogramGUID();
+
+
+            self.CommandsGet(GUID);
             self.timeLineOptions.selectedTime(new Date(0));
-            self.GetIntervals(cyc.GUID);
+            self.GetIntervals(GUID);
 
             if (!self.timeLineOptions.isZoom()) {
                 self.timeLineOptions.isZoom(true);
@@ -193,8 +196,8 @@ namespace rlab.nkpori {
         buildSVGSquares() {
             let self = this;
             let sqaures = [];
-            let countX = 40;
-            let countY = 80;
+            let countX = 15;
+            let countY = 15;
             let countSquare = 0;
 
             self.instruments().forEach(instr => {
@@ -211,14 +214,14 @@ namespace rlab.nkpori {
                 });
                 sqaures.push(square);
 
-                if (countSquare < 3) {
+                if (countSquare < 2) {
                     countY = countY + 100;
                     countSquare++;
 
                 }
                 else {
                     countX = countX + 200;
-                    countY = 80;
+                    countY = 15;
                     countSquare = 0;
                 }
 
@@ -260,7 +263,7 @@ namespace rlab.nkpori {
             let self = this;
 
             rlab.services.Request({
-                url: "/0/services/StateMachine.svc/state",
+                url: "../services/StateMachine.svc/state",
                 //request: {
                 //    spacecraft: self.spaceCraft(),
                 //},
@@ -343,8 +346,8 @@ namespace rlab.nkpori {
                     if (key == instr.guidInstr) {
                         //instr.data = { begin: new Date(), end: new Date(), value: count + 1 };
                         if (value.length > 1) { 
-                            let startOffset = value[0].stopOffset;
-                            let stopOffset = value[value.length - 2].stopOffset;
+                            let startOffset = value[0].startOffset;
+                            let stopOffset = value[value.length - 1].stopOffset;
 
                             instr.data.push({ begin: new Date(startOffset * 1000), end: new Date(stopOffset * 1000), value: count + 1 });
                         }
@@ -354,7 +357,7 @@ namespace rlab.nkpori {
                     }
                         
                 });
-                count++;
+                count += 2;
 
                 //});
 
@@ -369,7 +372,7 @@ namespace rlab.nkpori {
             let self = this;
 
             rlab.services.Request({
-                url: `/0/services/StateMachine.svc/CalculationNI?sequence=${guid}`,
+                url: `../services/StateMachine.svc/CalculationNI?sequence=${guid}`,
                 //request: {
                 //    spacecraft: self.spaceCraft(),
                 //},
@@ -407,7 +410,7 @@ namespace rlab.nkpori {
             let self = this;
             
             rlab.services.Request({
-                url: "/0/services/Sequences.svc/sequenceitemdefinition",
+                url: "../services/Sequences.svc/sequenceitemdefinition",
                 //request: {
                 //    spacecraft: self.spaceCraft(),
                 //},
@@ -437,71 +440,71 @@ namespace rlab.nkpori {
             });
         }
 
-        FindCyclogramByGUID(self: CyclogramModel): Cyclogram {
-            return self.cyclograms().filter(cg => cg.GUID === self.selectedCyclogramGUID())[0];
+        //FindCyclogramByGUID(self: CyclogramModel): Cyclogram {
+        //    return self.cyclograms().filter(cg => cg.GUID === self.selectedCyclogramGUID())[0];
         
-        }
+        //}
 
 
-        nextCyclogramPage() {
-            this.cycTablePage++;
-            if (this.cycTablePage == 3) {
-                this.nextButton.disabled = true;
-            }
-            this.backButton.disabled = false;
-            this.GetCyclogram(this.cycTablePage);
-            //console.log(this.cycTablePage);
+        //nextCyclogramPage() {
+        //    this.cycTablePage++;
+        //    if (this.cycTablePage == 3) {
+        //        this.nextButton.disabled = true;
+        //    }
+        //    this.backButton.disabled = false;
+        //    this.GetCyclogram(this.cycTablePage);
+        //    //console.log(this.cycTablePage);
             
-        }
+        //}
         
 
-        prevCyclogramPage() {
-            this.cycTablePage--;
-            if (this.cycTablePage == 1) {
-                this.backButton.disabled = true;
-            }
-            this.nextButton.disabled = false;
-            this.GetCyclogram(this.cycTablePage);
-            //console.log(this.cycTablePage);
-        }
+        //prevCyclogramPage() {
+        //    this.cycTablePage--;
+        //    if (this.cycTablePage == 1) {
+        //        this.backButton.disabled = true;
+        //    }
+        //    this.nextButton.disabled = false;
+        //    this.GetCyclogram(this.cycTablePage);
+        //    //console.log(this.cycTablePage);
+        //}
 
-        GetCyclogram(page) {
-            let self = this;
-            rlab.services.Request({
-                //url: "/0/services/Sequences.svc/sequenceNI?rows=5&page=1",
-                url: `/0/services/Sequences.svc/sequenceNI?rows=5&page=${page}`,
-                //request: {
-                //    spacecraft: self.spaceCraft(),
-                //},
-                type: "GET",
-                contentType: "application/json",
-                success: function (data) {
-                    //console.log(data.rows);
-                    let tmp_data: (Cyclogram)[] = [];
-                    data.rows.forEach(cyc => {
-                        tmp_data.push({
-                            Title: cyc.Title, 
-                            GUID: cyc.GUID,
-                            UIModified: cyc.UIModified,
-                            comment: cyc.Comment,
-                            Editor: cyc.Editor
+        //GetCyclogram(page) {
+        //    let self = this;
+        //    rlab.services.Request({
+        //        //url: "/0/services/Sequences.svc/sequenceNI?rows=5&page=1",
+        //        url: `/0/services/Sequences.svc/sequenceNI?rows=5&page=${page}`,
+        //        //request: {
+        //        //    spacecraft: self.spaceCraft(),
+        //        //},
+        //        type: "GET",
+        //        contentType: "application/json",
+        //        success: function (data) {
+        //            //console.log(data.rows);
+        //            let tmp_data: (Cyclogram)[] = [];
+        //            data.rows.forEach(cyc => {
+        //                tmp_data.push({
+        //                    Title: cyc.Title, 
+        //                    GUID: cyc.GUID,
+        //                    UIModified: cyc.UIModified,
+        //                    comment: cyc.Comment,
+        //                    Editor: cyc.Editor
 
-                        });
-                    });
+        //                });
+        //            });
 
-                    self.cyclograms(tmp_data);
+        //            self.cyclograms(tmp_data);
 
-                    console.log("список ЦГ загружен");
-                },
-                error: function (data) {
-                    self.cyclograms([]);
+        //            console.log("список ЦГ загружен");
+        //        },
+        //        error: function (data) {
+        //            self.cyclograms([]);
 
 
 
-                    console.log("Ошибка загрузки списка ЦГ");
-                }
-            });
-        }
+        //            console.log("Ошибка загрузки списка ЦГ");
+        //        }
+        //    });
+        //}
 
         
        
@@ -510,7 +513,7 @@ namespace rlab.nkpori {
             let self = this;
 
             rlab.services.Request({
-                url: "/0/services/Sequences.svc/instrument",
+                url: "../services/Sequences.svc/instrument",
    
                 type: "GET",
                 contentType: "application/json",
@@ -558,7 +561,7 @@ namespace rlab.nkpori {
             let self = this;
             rlab.services.Request({
                 //url: "/services/Planning.svc/command",
-                url: `/0/services/Sequences.svc/sequenceitemNI?guidsequence=${guid}&rows=10000&page=1&sidx=Offset&sord=asc`,
+                url: `../services/Sequences.svc/sequenceitemNI?guidsequence=${guid}&rows=10000&page=1&sidx=Offset&sord=asc`,
                 //request: {
                 //    spacecraft: self.spaceCraft(),
                 //    guidCyclogram: guid
@@ -604,7 +607,7 @@ namespace rlab.nkpori {
                     });
 
                     self.timeLineOptions.isSelectTime(true);
-                    self.dateLimitParams().begin(new Date(-1 * 1000 * 30));
+                    self.dateLimitParams().begin(new Date(-1 * 1000 * 5));
                     self.dateLimitParams().end(new Date(tmp_data[tmp_data.length - 1].Offset() * 1.2));
                     self.commands(tmp_data);
                     //self.timeLineOptions.panels[1].data.push({ "iosph0-instr-pes_value1": "Режим 1", "begin": new Date(0), "end": new Date(50000) });

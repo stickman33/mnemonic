@@ -7,10 +7,8 @@ var rlab;
         var CyclogramModel = /** @class */ (function () {
             function CyclogramModel(params) {
                 this.isTimeLineVisible = ko.observable(false);
-                this.isSVGvisible = ko.observable(false);
+                this.isSVGvisible = ko.observable(true);
                 this.cycTablePage = 1;
-                this.backButton = document.getElementById("back");
-                this.nextButton = document.getElementById("next");
                 this.subscriptions = [];
                 this.timers = [];
                 //let m: Circle = { css: ko.observable("grey") };
@@ -49,6 +47,7 @@ var rlab;
                         {
                             //min: -1,
                             //max: 2,
+                            height: 200,
                             isAxis: false,
                             fields: []
                         }
@@ -56,7 +55,7 @@ var rlab;
                     selectedItems: ko.observableArray([]),
                     selectedTime: ko.observable(new Date(0))
                 };
-                this.backButton.disabled = true;
+                //this.backButton.disabled = true;
                 //this.subscriptions.push(this.spaceCraft.subscribe(newValue => {
                 //    this.GetCyclogram(this.cycTablePage);
                 //}, this));
@@ -67,7 +66,7 @@ var rlab;
                 console.log("CyclogramModel: constructed");
                 this.GetInstruments();
                 this.GetCommandDefinition();
-                this.GetCyclogram(this.cycTablePage);
+                //this.GetCyclogram(this.cycTablePage);
                 this.timeLineOptions;
                 this.GetStates();
             }
@@ -83,10 +82,10 @@ var rlab;
             CyclogramModel.prototype.ShowCyclogramContent = function (self) {
                 var _this = this;
                 self.dispose();
-                var cyc = self.FindCyclogramByGUID(self);
-                self.CommandsGet(cyc.GUID);
+                var GUID = self.selectedCyclogramGUID();
+                self.CommandsGet(GUID);
                 self.timeLineOptions.selectedTime(new Date(0));
-                self.GetIntervals(cyc.GUID);
+                self.GetIntervals(GUID);
                 if (!self.timeLineOptions.isZoom()) {
                     self.timeLineOptions.isZoom(true);
                 }
@@ -100,8 +99,8 @@ var rlab;
             CyclogramModel.prototype.buildSVGSquares = function () {
                 var self = this;
                 var sqaures = [];
-                var countX = 40;
-                var countY = 80;
+                var countX = 15;
+                var countY = 15;
                 var countSquare = 0;
                 self.instruments().forEach(function (instr) {
                     //let circle: Circle = { css: ko.observable("grey") };
@@ -115,13 +114,13 @@ var rlab;
                         text: ko.observable("None")
                     });
                     sqaures.push(square);
-                    if (countSquare < 3) {
+                    if (countSquare < 2) {
                         countY = countY + 100;
                         countSquare++;
                     }
                     else {
                         countX = countX + 200;
-                        countY = 80;
+                        countY = 15;
                         countSquare = 0;
                     }
                 });
@@ -155,7 +154,7 @@ var rlab;
             CyclogramModel.prototype.GetStates = function () {
                 var self = this;
                 rlab.services.Request({
-                    url: "/0/services/StateMachine.svc/state",
+                    url: "../services/StateMachine.svc/state",
                     //request: {
                     //    spacecraft: self.spaceCraft(),
                     //},
@@ -221,8 +220,8 @@ var rlab;
                         if (key == instr.guidInstr) {
                             //instr.data = { begin: new Date(), end: new Date(), value: count + 1 };
                             if (value.length > 1) {
-                                var startOffset = value[0].stopOffset;
-                                var stopOffset = value[value.length - 2].stopOffset;
+                                var startOffset = value[0].startOffset;
+                                var stopOffset = value[value.length - 1].stopOffset;
                                 instr.data.push({ begin: new Date(startOffset * 1000), end: new Date(stopOffset * 1000), value: count + 1 });
                             }
                             else {
@@ -230,7 +229,7 @@ var rlab;
                             }
                         }
                     });
-                    count++;
+                    count += 2;
                     //});
                 }
                 self.dateLimitParams.valueHasMutated();
@@ -239,7 +238,7 @@ var rlab;
             CyclogramModel.prototype.GetIntervals = function (guid) {
                 var self = this;
                 rlab.services.Request({
-                    url: "/0/services/StateMachine.svc/CalculationNI?sequence=" + guid,
+                    url: "../services/StateMachine.svc/CalculationNI?sequence=" + guid,
                     //request: {
                     //    spacecraft: self.spaceCraft(),
                     //},
@@ -271,7 +270,7 @@ var rlab;
             CyclogramModel.prototype.GetCommandDefinition = function () {
                 var self = this;
                 rlab.services.Request({
-                    url: "/0/services/Sequences.svc/sequenceitemdefinition",
+                    url: "../services/Sequences.svc/sequenceitemdefinition",
                     //request: {
                     //    spacecraft: self.spaceCraft(),
                     //},
@@ -297,62 +296,62 @@ var rlab;
                     }
                 });
             };
-            CyclogramModel.prototype.FindCyclogramByGUID = function (self) {
-                return self.cyclograms().filter(function (cg) { return cg.GUID === self.selectedCyclogramGUID(); })[0];
-            };
-            CyclogramModel.prototype.nextCyclogramPage = function () {
-                this.cycTablePage++;
-                if (this.cycTablePage == 3) {
-                    this.nextButton.disabled = true;
-                }
-                this.backButton.disabled = false;
-                this.GetCyclogram(this.cycTablePage);
-                //console.log(this.cycTablePage);
-            };
-            CyclogramModel.prototype.prevCyclogramPage = function () {
-                this.cycTablePage--;
-                if (this.cycTablePage == 1) {
-                    this.backButton.disabled = true;
-                }
-                this.nextButton.disabled = false;
-                this.GetCyclogram(this.cycTablePage);
-                //console.log(this.cycTablePage);
-            };
-            CyclogramModel.prototype.GetCyclogram = function (page) {
-                var self = this;
-                rlab.services.Request({
-                    //url: "/0/services/Sequences.svc/sequenceNI?rows=5&page=1",
-                    url: "/0/services/Sequences.svc/sequenceNI?rows=5&page=" + page,
-                    //request: {
-                    //    spacecraft: self.spaceCraft(),
-                    //},
-                    type: "GET",
-                    contentType: "application/json",
-                    success: function (data) {
-                        //console.log(data.rows);
-                        var tmp_data = [];
-                        data.rows.forEach(function (cyc) {
-                            tmp_data.push({
-                                Title: cyc.Title,
-                                GUID: cyc.GUID,
-                                UIModified: cyc.UIModified,
-                                comment: cyc.Comment,
-                                Editor: cyc.Editor
-                            });
-                        });
-                        self.cyclograms(tmp_data);
-                        console.log("список ЦГ загружен");
-                    },
-                    error: function (data) {
-                        self.cyclograms([]);
-                        console.log("Ошибка загрузки списка ЦГ");
-                    }
-                });
-            };
+            //FindCyclogramByGUID(self: CyclogramModel): Cyclogram {
+            //    return self.cyclograms().filter(cg => cg.GUID === self.selectedCyclogramGUID())[0];
+            //}
+            //nextCyclogramPage() {
+            //    this.cycTablePage++;
+            //    if (this.cycTablePage == 3) {
+            //        this.nextButton.disabled = true;
+            //    }
+            //    this.backButton.disabled = false;
+            //    this.GetCyclogram(this.cycTablePage);
+            //    //console.log(this.cycTablePage);
+            //}
+            //prevCyclogramPage() {
+            //    this.cycTablePage--;
+            //    if (this.cycTablePage == 1) {
+            //        this.backButton.disabled = true;
+            //    }
+            //    this.nextButton.disabled = false;
+            //    this.GetCyclogram(this.cycTablePage);
+            //    //console.log(this.cycTablePage);
+            //}
+            //GetCyclogram(page) {
+            //    let self = this;
+            //    rlab.services.Request({
+            //        //url: "/0/services/Sequences.svc/sequenceNI?rows=5&page=1",
+            //        url: `/0/services/Sequences.svc/sequenceNI?rows=5&page=${page}`,
+            //        //request: {
+            //        //    spacecraft: self.spaceCraft(),
+            //        //},
+            //        type: "GET",
+            //        contentType: "application/json",
+            //        success: function (data) {
+            //            //console.log(data.rows);
+            //            let tmp_data: (Cyclogram)[] = [];
+            //            data.rows.forEach(cyc => {
+            //                tmp_data.push({
+            //                    Title: cyc.Title, 
+            //                    GUID: cyc.GUID,
+            //                    UIModified: cyc.UIModified,
+            //                    comment: cyc.Comment,
+            //                    Editor: cyc.Editor
+            //                });
+            //            });
+            //            self.cyclograms(tmp_data);
+            //            console.log("список ЦГ загружен");
+            //        },
+            //        error: function (data) {
+            //            self.cyclograms([]);
+            //            console.log("Ошибка загрузки списка ЦГ");
+            //        }
+            //    });
+            //}
             CyclogramModel.prototype.GetInstruments = function () {
                 var self = this;
                 rlab.services.Request({
-                    url: "/0/services/Sequences.svc/instrument",
+                    url: "../services/Sequences.svc/instrument",
                     type: "GET",
                     contentType: "application/json",
                     success: function (data) {
@@ -389,7 +388,7 @@ var rlab;
                 var self = this;
                 rlab.services.Request({
                     //url: "/services/Planning.svc/command",
-                    url: "/0/services/Sequences.svc/sequenceitemNI?guidsequence=" + guid + "&rows=10000&page=1&sidx=Offset&sord=asc",
+                    url: "../services/Sequences.svc/sequenceitemNI?guidsequence=" + guid + "&rows=10000&page=1&sidx=Offset&sord=asc",
                     //request: {
                     //    spacecraft: self.spaceCraft(),
                     //    guidCyclogram: guid
@@ -425,7 +424,7 @@ var rlab;
                             tmp_data.push(item);
                         });
                         self.timeLineOptions.isSelectTime(true);
-                        self.dateLimitParams().begin(new Date(-1 * 1000 * 30));
+                        self.dateLimitParams().begin(new Date(-1 * 1000 * 5));
                         self.dateLimitParams().end(new Date(tmp_data[tmp_data.length - 1].Offset() * 1.2));
                         self.commands(tmp_data);
                         //self.timeLineOptions.panels[1].data.push({ "iosph0-instr-pes_value1": "Режим 1", "begin": new Date(0), "end": new Date(50000) });

@@ -1,115 +1,119 @@
 ﻿<!DOCTYPE html>
-<html>
+<!--
+/*!
+ * testgrid v1.0.1
+ *
+ * Date: 2022-06-16 16:06:34
+ */
+--> 
+<html lang="en">
+
 <head>
-    <meta charset="utf-8" />
-    <link rel="shortcut icon" href="/image/iki-sat.ico" type="image/x-icon" />
-    <title>Мнемосхема</title>
+    <title>Мемосхема</title>
+    <!--#include virtual="/menu/head.html" -->
+    <link rel="stylesheet" type="text/css" href="/css/grid/ui.jqgrid.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/sequenceeditor.css" />
+    <script type="text/javascript" src="/lib/grid/i18n/grid.locale-ru.js"></script>
+    <script type="text/javascript" src="/lib/sequenceeditor.locale-ru.js"></script>
+    <script type="text/javascript">
+        $.jgrid = $.jgrid || {};
+        $.jgrid.no_legacy_api = true;
+    </script>
+    <script type="text/javascript" src="/lib/grid/jquery.jqgrid.src.js"></script>
+    <script type="text/javascript" src="/lib/sequenceeditor.common.js"></script>
+    <script type="text/javascript" src="js/sequenceviewerrNI.colmodel.master.js"></script>
+
+    <!--<script src="/mnemonic/lib/script/knockout.js"></script>-->
+    <script src="/lib/knockout.js"></script>
+    <script src="lib/script/rlab.services.js"></script>
+    <script src="/lib/rlab.ext.date.js"></script>
+    <script src="/lib/rlab.knockout.textFormat.js"></script>
+    <script src="lib/script/rlab.knockout.checkboxIndeterminate.js"></script>
+
+    <script src="lib/script/rlab.knockout.datetimeValue.js"></script>
+    <link rel="stylesheet" href="lib/css/rlab.knockout.datetimeValue.css" type="text/css" />
+
+    <script src="lib/script/rlab.knockout.timespanValue.js"></script>
+    <link rel="stylesheet" href="lib/css/rlab.knockout.timespanValue.css" type="text/css" />
 
 
-    <script src="/mnemonic/lib/script/knockout.js"></script>
-    <script src="/mnemonic/lib/script/rlab.services.js"></script>
-    <script src="/mnemonic/lib/script/rlab.ext.date.js"></script>
-    <script src="/mnemonic/lib/script/rlab.knockout.textFormat.js"></script>
-    <script src="/mnemonic/lib/script/rlab.knockout.checkboxIndeterminate.js"></script>
-
-    <script src="/mnemonic/lib/script/rlab.knockout.datetimeValue.js"></script>
-    <link rel="stylesheet" href="/mnemonic/lib/css/rlab.knockout.datetimeValue.css" type="text/css" />
-
-    <script src="/mnemonic/lib/script/rlab.knockout.timespanValue.js"></script>
-    <link rel="stylesheet" href="/mnemonic/lib/css/rlab.knockout.timespanValue.css" type="text/css" />
-
-
-    <script src="/mnemonic/lib/script/rlab.timeline.js"></script>
-    <link rel="stylesheet" href="/mnemonic/lib/css/rlab.timeline.css" type="text/css" />
+    <script src="lib/script/rlab.timeline.js"></script>
+    <link rel="stylesheet" href="lib/css/rlab.timeline.css" type="text/css" />
 
 
 
-    <script src="/mnemonic/lib/rlab.nkpori.config.js"></script>
-    <script src="/mnemonic/cyclogram/rlab.nkpori.cyclogram.js"></script>
-    <link rel="stylesheet" href="/mnemonic/cyclogram/rlab.nkpori.cyclogram.css" type="text/css" />
-
-</head>
+    <script src="lib/rlab.nkpori.config.js"></script>
+    <script src="cyclogram/rlab.nkpori.cyclogram.js"></script>
+    </head>
 <body>
-    <h2>Мнемосхема</h2>
+    <header></header>
+    <main role="main" class="container">
+        <h1 class="mt-5">Мемосхема</h1>
+    </main>
 
-    <!--<div>
-        <span>Ионосфера-М № </span>
-        <select data-bind="options: rlab.nkpori.SCs, optionsValue: 'key', optionsText: 'title', value: spaceCraft"></select>
-    </div>-->
 
-    <div>
-        <h4>Циклограммы</h4>
-        <table class="collapsed-table bordered-table">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>GUID</th>
-                    <th>Изменено</th>
-                    <th>Название</th>
-                    <th>Комментарий</th>
-                    <th>Редактор</th>
-                </tr>
-                <tr></tr>
-            </thead>
-            <tbody data-bind="foreach:cyclograms">
-                <tr>
-                    <td>
-                        <input type="radio" name="radioCyclogram" data-bind="checkedValue: $data.GUID, checked: $root.selectedCyclogramGUID">
-                    </td>
 
-                    <td data-bind="text:GUID"></td>
-                    <td data-bind="text:UIModified"></td>
-                    <td data-bind="text:Title"></td>
-                    <td data-bind="text:comment"></td>
-                    <td data-bind="text:Editor"></td>
+    <main role="main" class="container-fluid">
 
-                </tr>
-            </tbody>
-        </table>
-        <button id="back" data-bind="click: function(){$root.prevCyclogramPage();}">Back</button>
-        <button id="next" data-bind="click: function(){$root.nextCyclogramPage();}">Next</button>
-        <button data-bind="enable: $root.selectedCyclogramGUID() !== null , click: function(){$root.ShowCyclogramContent($root);}">Загрузить</button>
-    </div>
+        <div id="scInfoContainer" style="margin:20px;">
+            <span id="jqGridInfo"></span>
+        </div>
 
-    <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime()"></span>
+
+
+        <div class="container-fluid">
+            <div class="row">
+
+
+                <div class="col-sm-4" style="margin:20px;" id="jqGridMasterContainer">
+                    <table id="jqGridMaster"></table>
+                    <div id="jqGridMasterPager"></div>
+                </div>
+
+
+                <div class="col-sm-2" data-bind="if: isSVGvisible">
+                    <svg width="590" height="300" viewBox="0 0 590 300" style="border: 1px solid black; margin: 20px;">
+                        <rect x="0" y="0" width="590" height="300" fill="lightgray"></rect>
+
+                        <g data-bind="foreach: mnemoSquares">
+                            <g data-bind="attr: { transform: position }">
+                                <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
+                                <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
+
+                                <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
+                                <text x="5" y="35" data-bind="text: text"></text>
+
+                                <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
+                                    <text data-bind="text: text"></text>
+                                </foreignObject>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+    <footer class="footer"></footer>
+    <script>
+        $("header").load("/menu/header.html");
+        $("footer").load("/menu/footer.html");
+    </script>
+    <script type="text/javascript" src="js/sequenceviewerNI.js"></script>
+
+
+
+    <span style="margin-left: 20px;" data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime()"></span>
 
 
     <div data-bind="if: isTimeLineVisible">
-        <div data-bind="component: { name: 'timeline', params: timeLineOptions }">
+        <div data-bind="component: { name: 'timeline', params: timeLineOptions }" style="margin:20px;">
         </div>
     </div>
 
 
-    <div data-bind="if: isSVGvisible">
-        <svg width="640" height="520" viewBox="0 0 640 520" style="border:1px solid black">
-            <rect x="0" y="0" width="640" height="520" fill="lightgray"></rect>
 
-            <g data-bind="foreach: mnemoSquares">
-                <g data-bind="attr: { transform: position }">
-                    <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
-                    <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
-
-                    <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
-                    <!--<text x="5" y="35" data-bind="text: text"></text>-->
-                    <foreignObject x="5" y="25" width="145" height="50">
-                        <text data-bind="text: text"></text>
-                    </foreignObject>
-                </g>
-            </g>
-
-
-
-            <!--<g transform="translate(440, 180)" class="detailContainer">
-                <rect x="0" y="0" width="155" height="70" rx="5" ry="5" fill="grey" stroke="black"></rect>
-                <text text-anchor="middle" x="75" y="18">TEST</text>
-
-                <foreignObject x="5" y="25" width="145" height="50">
-                    <text data-bind="text: 'This text should wrap after 145 pixels'"></text>
-                </foreignObject>
-            </g>-->
-
-        </svg>
-    </div>
 
     <script>
         IndexViewModel = new rlab.nkpori.CyclogramModel();
