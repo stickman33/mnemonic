@@ -108,10 +108,10 @@ var rlab;
                         GUID: instr.GUID.toString(),
                         Title: instr.Title.toString(),
                         Circle: { css: ko.observable("grey") },
-                        fill: ko.observable("grey"),
+                        fill: ko.observable("#ebebeb"),
                         stroke: ko.observable("black"),
                         position: "translate(" + countX + "," + countY + ")",
-                        text: ko.observable("None")
+                        text: ko.observable("Отсутствует")
                     });
                     sqaures.push(square);
                     if (countSquare < 2) {
@@ -190,7 +190,7 @@ var rlab;
                                     self.mnemoSquares().forEach(function (square) {
                                         if (square.GUID == state.GUIDInstrument) {
                                             square.text(state.Title);
-                                            if (state.Title == "Выключен" || state.Title == null) {
+                                            if (state.Title == "Отключен") {
                                                 square.fill("grey");
                                             }
                                             else {

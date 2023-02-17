@@ -22,9 +22,8 @@
 				$(document).ready(function () {
 
 					var lastSel;
-					var lastCommandSel;
 					var lastCommandRowNum;
-					var lastEdited;
+
 
 
 					//dataInitCommand = function (elem) {
@@ -37,7 +36,7 @@
 
 					// Sequence grid
 					$('#jqGridMaster').jqGrid($.extend({
-						caption: 'Cyclogram list',
+						caption: $.jgrid.locales.ru.masterTable.caption || 'Cyclogram list',
 						pager: '#jqGridMasterPager',
 						url: url + 'sequenceNI',
 						editurl: url + 'sequenceNI',
@@ -116,7 +115,8 @@
 						searchOperators: true,
 					});
 
-					$(window).on('resize', { gridsOnPage: ['#jqGridMaster', '#jqGridDetail'] }, resizeGrid).trigger('resize');
+
+					$(window).on('resize', { gridsOnPage: ['#jqGridMaster'] }, resizeGrid).trigger('resize');
 
 				})
 			}) // end done
