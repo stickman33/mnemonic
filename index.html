@@ -9,12 +9,23 @@
 <html lang="en">
 
 <head>
-    <title>Мемосхема</title>
-    <!--#include virtual="/menu/head.html" -->
+    <title>Мнемосхема</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="/media/iki_icov2.png" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap/font-awesome.css" />
+
+    <!-- Custom styles for sticky footer -->
+    <link href="/css/sticky-footer-navbar.css" rel="stylesheet">
+
+    <!-- <link rel="stylesheet" href="/css/site.css"> -->
+    <script type="text/javascript" src="/lib/jquery/jquery.js"></script>
+
+
     <link rel="stylesheet" type="text/css" href="/css/grid/ui.jqgrid.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="/css/sequenceeditor.css" />
-
-
     <script type="text/javascript" src="/lib/grid/i18n/grid.locale-ru.js"></script>
     <script type="text/javascript" src="/lib/sequenceeditor.locale-ru.js"></script>
     <script type="text/javascript">
@@ -23,9 +34,9 @@
     </script>
     <script type="text/javascript" src="/lib/grid/jquery.jqgrid.src.js"></script>
     <script type="text/javascript" src="/lib/sequenceeditor.common.js"></script>
-    <script type="text/javascript" src="js/sequenceviewerrNI.colmodel.master.js"></script>
+    <script type="text/javascript" src="/0/sequenceni/js/sequenceeditorNI.colmodel.master.js"></script>
 
-    <!--<script src="/mnemonic/lib/script/knockout.js"></script>-->
+
     <script src="/lib/knockout.js"></script>
     <script src="lib/script/rlab.services.js"></script>
     <script src="/lib/rlab.ext.date.js"></script>
@@ -50,217 +61,74 @@
 <body>
     <header></header>
     <main role="main" class="container">
-        <h1 class="mt-5">Мемосхема</h1>
+        <h1 class="mt-5">Мнемосхема</h1>
     </main>
 
 
-
-    <!--<main role="main" class="container-fluid">
-
-        <div id="scInfoContainer" style="margin:20px;">
-            <span id="jqGridInfo"></span>
-        </div>
-
-
-
-        <div class="container-fluid" style="margin:20px;">
-            <div class="row">
-
-
-                <div class="col-sm-4" id="jqGridMasterContainer">
-                    <table id="jqGridMaster"></table>
-                    <div id="jqGridMasterPager"></div>
-                </div>
-
-
-                <div class="col-sm-2" data-bind="if: isSVGvisible">
-                    <svg width="590" height="300" viewBox="0 0 590 300" style="border: 1px solid black; margin: 20px;">
-                        <rect x="0" y="0" width="590" height="300" fill="lightgray"></rect>
-
-                        <g data-bind="foreach: mnemoSquares">
-                            <g data-bind="attr: { transform: position }">
-                                <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
-                                <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
-
-                                <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
-
-                                <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
-                                    <text data-bind="text: text"></text>
-                                </foreignObject>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </main>-->
-
     <main role="main" class="container-fluid">
 
-        
-
-
-
         <!--row for grid and svg mnemonic-->
-            <div class="row m-3">
-                <!--grid-->
-                <div class="col-xl-7 col-md-12 col-lg-12 col-12" >
+        <div class="row m-3">
+            <!--grid-->
+            <div class="col-xl-7 col-md-12 col-lg-12 col-12">
 
-                    <div id="jqGridMasterContainer">
-                        <table id="jqGridMaster"></table>
-                        <div id="jqGridMasterPager"></div>
-                    </div>
-                    
-                </div>
-                <!--mnemonic-->
-                <div class="col-xl-5 col-md-12 col-lg-12 col-12">
-
-                    <div data-bind="if: isSVGvisible" class="container-fluid border border-dark" style="background-color: lightgray;">
-                        <!--<svg width="100%" height="300" viewBox="0 0 590 300" style="border: 1px solid black;" preserveAspectRatio="none">-->
-                        <!--<svg width="590" height="300" viewBox="0 0 590 300" style="border: 1px solid black;">-->
-                        <!--<rect x="0" y="0" width="100%" height="300" fill="none"></rect>-->
-                        <!--<svg>
-
-                   <symbol id="potofgold">
-                       <g fill="url(#coin)" stroke="darkgoldenrod" stroke-width="0.5">
-                           <circle r="5" transform="translate(30,7)" />
-                           <circle r="5" transform="translate(35,13)" />
-                           <circle r="5" transform="translate(22,10)" />
-                           <circle r="5" transform="translate(27,9)" />
-                           <circle r="5" transform="translate(18,17)" />
-                           <circle r="5" transform="translate(42,18)" />
-                           <circle r="5" transform="translate(32,19)" />
-                           <circle r="5" transform="translate(30,14)" />
-                           <circle r="5" transform="translate(25,15)" />
-                           <circle r="5" transform="translate(37,19)" />
-                           <circle r="5" transform="translate(31,16)" />
-                           <circle r="5" transform="translate(20,18)" />
-                           <circle r="5" transform="translate(26,21)" />
-                       </g>
-                       <path fill="url(#pot)" stroke="#751" stroke-width="0.5"
-                             d="M30,50 C45,50 55,45 55,35
-        Q 55,27 50,25 C55,22 53,15 45,20
-        S 23,25 15,20 S5,22 10,25
-        Q 5,27 5,35 C5,45 15,50 30,50Z" />
-                   </symbol>-->
-                        <!--<symbol id="instrument">
-            <g data-bind="attr: { transform: $this.position }">
-                <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: $this.fill(), stroke: $this.stroke() }"></rect>
-                <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: $this.Circle.css() }"></circle>
-
-                <text text-anchor="middle" x="75" y="18" data-bind="text: $this.Title"></text>
-
-                <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
-                    <text data-bind="text: $this.text"></text>
-                </foreignObject>
-            </g>
-
-        </symbol>-->
-                        <!--</svg>-->
-                        <!--<figure>
-            <div>
-                <svg viewBox="0 0 60 55" width="200" height="100">
-                    <use xlink:href="#potofgold" />
-                </svg>
-            </div>
-        </figure>-->
-                        <!--<figure>
-            <div>
-                <svg viewBox="0 0 171 86" width="171" height="86" transform="translate(0,-265)">
-                    <g data-bind="foreach: mnemoSquares">-->
-                        <!--<g data-bind="attr: { transform: position }">-->
-                        <!--<rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
-        <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
-
-        <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
-
-        <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
-            <text data-bind="text: text"></text>
-        </foreignObject>-->
-                        <!--</g>-->
-                        <!--</g>
-
-                </svg>
-            </div>
-        </figure>-->
-
-                        <figure style="margin: 15px;">
-                            <div data-bind="foreach: mnemoSquares">
-                                <svg viewBox="0 0 170 88" width="170" height="88">
-                                    <!--<g data-bind="foreach: mnemoSquares">-->
-                                    <g>
-                                        <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
-                                        <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
-
-                                        <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
-
-                                        <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
-                                            <text data-bind="text: text"></text>
-                                        </foreignObject>
-                                    </g>
-                                    <!--</g>-->
-
-                                </svg>
-                            </div>
-                        </figure>
-
-                        <!--</svg>-->
-                    </div>
-
-
-                </div>
-            </div>
-                
-                <!--row for selecte time--> 
-                <div class="row m-3">
-
-                    <div class="col">
-                        <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime()"></span>
-                    </div>
-
-                </div>
-
-                    <!--row for timeline-->
-                <div class="row m-3">
-                    <div class="col">
-
-                        <div data-bind="if: isTimeLineVisible">
-                            <div data-bind="component: { name: 'timeline', params: timeLineOptions }"></div>
-                        </div>
-
-                    </div>
-                </div>
-
-        <!--<div class="w3-row">
-            <div class="w3-col w3-right" data-bind="if: isSVGvisible" style="width: 590px; margin:20px;">
-                <svg width="590" height="300" viewBox="0 0 590 300" style="border: 1px solid black;">
-                    <rect x="0" y="0" width="590" height="300" fill="lightgray"></rect>
-
-                    <g data-bind="foreach: mnemoSquares">
-                        <g data-bind="attr: { transform: position }">
-                            <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
-                            <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
-
-                            <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
-
-                            <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
-                                <text data-bind="text: text"></text>
-                            </foreignObject>
-                        </g>
-                    </g>
-                </svg>
-            </div>
-
-            <div class="w3-rest" style="min-width: 500px; margin: 20px;">
                 <div id="jqGridMasterContainer">
                     <table id="jqGridMaster"></table>
                     <div id="jqGridMasterPager"></div>
                 </div>
+
+            </div>
+            <!--mnemonic-->
+            <div class="col-xl-5 col-md-12 col-lg-12 col-12">
+
+                <div data-bind="if: isSVGvisible" class="container-fluid border border-dark" style="background-color: lightgray;">
+
+                    <figure style="margin: 15px;">
+                        <div data-bind="foreach: mnemoSquares">
+                            <svg viewBox="0 0 170 88" width="170" height="88">
+                                <!--<g data-bind="foreach: mnemoSquares">-->
+                                <g>
+                                    <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
+                                    <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
+
+                                    <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
+
+                                    <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
+                                        <text data-bind="text: text"></text>
+                                    </foreignObject>
+                                </g>
+                                <!--</g>-->
+
+                            </svg>
+                        </div>
+                    </figure>
+
+                    <!--</svg>-->
+                </div>
+
+
+            </div>
+        </div>
+
+        <!--row for selecte time-->
+        <div class="row m-3">
+
+            <div class="col">
+                <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime()"></span>
             </div>
 
+        </div>
 
-        </div>-->
+        <!--row for timeline-->
+        <div class="row m-3">
+            <div class="col">
 
+                <div data-bind="if: isTimeLineVisible">
+                    <div data-bind="component: { name: 'timeline', params: timeLineOptions }"></div>
+                </div>
+
+            </div>
+        </div>
     </main>
 
 
@@ -272,14 +140,6 @@
         $("footer").load("/menu/footer.html");
     </script>
     <script type="text/javascript" src="js/sequenceviewerNI.js"></script>
-
-
-
-    
-
-
-
-
     <br>
     <br>
     <br>
