@@ -400,7 +400,7 @@ var rlab;
                         var tmp_data = [];
                         data.forEach(function (com) {
                             ///kostyl' !!!!!!
-                            //com.Instrument = Instr[0].key
+                            //com.Instrument = Instr[0].key 
                             var item = {
                                 GUID: com.GUID,
                                 GUIDSequenceItemDef: com.GUIDSequenceItemDef,

@@ -315,7 +315,6 @@ namespace rlab.nkpori {
                                         }
                                         else {
                                             square.fill("#a8c6f7");
-                                            
                                         }
 
                                         if (val.GUIDState == "2e85bad5-6a49-ed11-8edc-00155d09ea1d") {
@@ -579,7 +578,7 @@ namespace rlab.nkpori {
                     data.forEach(com => {
 
                         ///kostyl' !!!!!!
-                        //com.Instrument = Instr[0].key
+                        //com.Instrument = Instr[0].key 
 
                         let item = {
                             GUID: com.GUID,

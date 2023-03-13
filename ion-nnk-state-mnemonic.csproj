@@ -82,6 +82,7 @@
     <!-- <Content Include="lib\css\iki-sat.ico" /> -->
     <!-- <Content Include="lib\css\logo-iki.svg" /> -->
     <!-- <Content Include="lib\css\logo-planet.jpg" /> -->
+    <Content Include="js\config.js" />
     <Content Include="lib\css\rlab.knockout.datetimeValue.css" />
     <Content Include="lib\css\rlab.knockout.timespanValue.css" />
     <Content Include="lib\script\rlab.knockout.datetimeValue.js" />
