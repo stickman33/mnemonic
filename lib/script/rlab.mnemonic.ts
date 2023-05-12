@@ -6,8 +6,12 @@
         Circle: Circle,
         fill: ko.Observable<string>,
         stroke: ko.Observable<string>,
-        position: string,
-        text: ko.Observable<string>
+        text: ko.Observable<string>,
+        top: string,
+        left: string,
+        width: ko.Observable<number>,
+        height: ko.Observable<number>,
+        index: number
     }
 
     export interface Circle {
