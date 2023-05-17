@@ -221,7 +221,7 @@ var rlab;
                     switch (squareIndex) {
                         case 0:
                         case 7:
-                            lineOffset = 30;
+                            lineOffset = 10;
                             offset = bkusniCoords.width / 16;
                             break;
                         case 1:
@@ -234,7 +234,7 @@ var rlab;
                             break;
                         case 3:
                         case 10:
-                            lineOffset = -60;
+                            lineOffset = -40;
                             offset = bkusniCoords.width * 13 / 16;
                             break;
                     }
@@ -243,7 +243,7 @@ var rlab;
                     switch (squareIndex) {
                         case 0:
                         case 7:
-                            lineOffset = 60;
+                            lineOffset = 40;
                             offset = bkusniCoords.width * 3 / 16;
                             break;
                         case 1:
@@ -258,7 +258,7 @@ var rlab;
                             break;
                         case 3:
                         case 10:
-                            lineOffset = -30;
+                            lineOffset = -10;
                             offset = bkusniCoords.width * 15 / 16;
                             break;
                         case 4:
@@ -319,7 +319,7 @@ var rlab;
             CyclogramModel.prototype.resizeSVGSquare = function () {
                 var self = this;
                 var squareWidth = self.calcSVGSquareWidth();
-                console.log(squareWidth);
+                //console.log(squareWidth);
                 self.mnemoSquares().forEach(function (square) {
                     square.height(squareWidth * 0.4375);
                 });
