@@ -137,12 +137,12 @@ var rlab;
             };
             CyclogramModel.prototype.drawBKUSNILines = function () {
                 var self = this;
+                //svgLines.remove();
                 var svgDiv = document.getElementById("figure");
-                //const svg = document.getElementById("БКУСНИ");
-                //let div = document.getElementById("SVG").getBoundingClientRect();
                 var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                 svg.setAttribute("width", "100%");
                 svg.setAttribute("height", "100%");
+                svg.setAttribute("id", "lines");
                 self.mnemoSquares().forEach(function (square) {
                     //if (square.Title == "БКУСНИ") {
                     //    line.setAttribute("x1", "0px");
@@ -173,9 +173,19 @@ var rlab;
                     svg.appendChild(kbvLine);
                     svg.appendChild(pollLine);
                 });
+                //let lineHalfset = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                //lineHalfset.setAttribute("stroke", "black");
+                //lineHalfset.setAttribute("stroke-width", "2");
+                //lineHalfset.setAttribute("z-index", "100");
+                //lineHalfset.setAttribute("x1", "6px");
+                //lineHalfset.setAttribute("y1", "270px");
+                //lineHalfset.setAttribute("x2", "155px");
+                //lineHalfset.setAttribute("y2", "270px");
+                //svg.appendChild(lineHalfset);
                 //svg.appendChild(pollLine);
                 svgDiv.appendChild(svg);
                 //document.body.appendChild(svg);
+                self.updBKUSNIlines();
             };
             CyclogramModel.prototype.updBKUSNIlines = function () {
                 var self = this;
@@ -325,7 +335,95 @@ var rlab;
                 });
                 self.updBKUSNIlines();
             };
-            CyclogramModel.prototype.drawSVGSquare = function () {
+            CyclogramModel.prototype.buildSVGsquares = function () {
+                var self = this;
+                var elemFigure = document.getElementById("figure");
+                var fragment = document.createDocumentFragment();
+                var elemDiv = document.createElement("div");
+                elemDiv.setAttribute("id", "squares");
+                var svgns = "http://www.w3.org/2000/svg";
+                self.mnemoSquares().forEach(function (square) {
+                    var elemSVG = document.createElementNS(svgns, "svg");
+                    elemSVG.setAttribute("viewBox", "0 0 160 75");
+                    var svgBinding = "style: { 'position': 'absolute', 'top': top, 'left': left, 'width': width, 'height': height }";
+                    elemSVG.setAttribute("id", square.Title);
+                    elemSVG.setAttribute("data-bind", svgBinding);
+                    var svgBindingContext = {
+                        top: square.top,
+                        left: square.left,
+                        width: square.width,
+                        height: square.height
+                    };
+                    ko.applyBindings(svgBindingContext, elemSVG);
+                    var elemGroup = document.createElementNS(svgns, "g");
+                    var groupElements = [];
+                    var elemRect = document.createElementNS(svgns, "rect");
+                    var elemCircle = document.createElementNS(svgns, "circle");
+                    var elemTextTitle = document.createElementNS(svgns, "text");
+                    var elemForeignObject = document.createElementNS(svgns, "foreignObject");
+                    var elemTextInObject = document.createElement("text");
+                    elemRect.setAttribute("x", "0");
+                    elemRect.setAttribute("y", "0");
+                    elemRect.setAttribute("width", "155");
+                    elemRect.setAttribute("height", "70");
+                    elemRect.setAttribute("rx", "5");
+                    elemRect.setAttribute("ry", "5");
+                    var rectBinding = "attr: { 'fill': fill, 'stroke': stroke }";
+                    elemRect.setAttribute("data-bind", rectBinding);
+                    var rectBindingContext = {
+                        fill: square.fill,
+                        stroke: square.stroke
+                    };
+                    ko.applyBindings(rectBindingContext, elemRect);
+                    elemCircle.setAttribute("cx", "140");
+                    elemCircle.setAttribute("cy", "10");
+                    elemCircle.setAttribute("r", "5");
+                    elemCircle.setAttribute("stroke", "black");
+                    elemCircle.setAttribute("strokeWidth", "1");
+                    var circleBinding = "attr: { 'fill': fill }";
+                    elemCircle.setAttribute("data-bind", circleBinding);
+                    var circleBindingContext = {
+                        fill: square.Circle.css
+                    };
+                    ko.applyBindings(circleBindingContext, elemCircle);
+                    elemTextTitle.setAttribute("text-anchor", "middle");
+                    elemTextTitle.setAttribute("x", "75");
+                    elemTextTitle.setAttribute("y", "18");
+                    elemTextTitle.textContent = square.Title;
+                    elemForeignObject.setAttribute("x", "5");
+                    elemForeignObject.setAttribute("y", "25");
+                    elemForeignObject.setAttribute("width", "145");
+                    elemForeignObject.setAttribute("height", "50");
+                    elemForeignObject.setAttribute("style", "font-size: 14px; line-height: 20px;");
+                    var textInObjBinding = "text: text";
+                    elemTextInObject.setAttribute("data-bind", textInObjBinding);
+                    var bindingContext = {
+                        text: square.text
+                    };
+                    ko.applyBindings(bindingContext, elemTextInObject);
+                    elemForeignObject.appendChild(elemTextInObject);
+                    groupElements.push(elemRect, elemCircle, elemTextTitle, elemForeignObject);
+                    //if (square.Title === "ГАЛС") {
+                    //    let elemLine = document.createElementNS(svgns, "line");
+                    //    elemLine.setAttribute("x1", "0");
+                    //    elemLine.setAttribute("y1", `${square.height() / 2}`);
+                    //    elemLine.setAttribute("x2", `${square.width()}`);
+                    //    elemLine.setAttribute("y2", `${square.height() / 2}`);
+                    //    elemLine.setAttribute("stroke", "black");  
+                    //    elemLine.setAttribute("stroke-width", "1");
+                    //    groupElements.push(elemLine);
+                    //}
+                    for (var _i = 0, groupElements_1 = groupElements; _i < groupElements_1.length; _i++) {
+                        var element = groupElements_1[_i];
+                        elemGroup.appendChild(element);
+                    }
+                    elemSVG.appendChild(elemGroup);
+                    elemDiv.appendChild(elemSVG);
+                });
+                fragment.appendChild(elemDiv);
+                elemFigure.appendChild(fragment);
+            };
+            CyclogramModel.prototype.calcSVGSquares = function () {
                 var self = this;
                 var squares = [];
                 var squareWidth = self.calcSVGSquareWidth();
@@ -523,6 +621,8 @@ var rlab;
             };
             CyclogramModel.prototype.GetIntervals = function (guid) {
                 var self = this;
+                var svgLines = document.getElementById("lines");
+                var divSqaures = document.getElementById("squares");
                 rlab.services.Request({
                     url: "../services/StateMachine.svc/CalculationNI?sequence=" + guid,
                     //request: {
@@ -536,18 +636,20 @@ var rlab;
                         data.forEach(function (instr) {
                             tmp_intervals = instr.Value;
                             self.intervals[instr.Key] = tmp_intervals;
-                            //console.log(tmp_intervals);
-                            //console.log(tmp_dict);
-                            //console.log(instr.Key);
-                            //console.log(instr.Value);
                         });
-                        self.drawSVGSquare();
-                        self.drawBKUSNILines();
+                        self.calcSVGSquares();
+                        if (divSqaures) {
+                            divSqaures.remove();
+                        }
+                        self.buildSVGsquares();
+                        if (svgLines) {
+                            self.updBKUSNIlines();
+                        }
+                        else {
+                            self.drawBKUSNILines();
+                        }
                         self.updSVGSquareState();
                         self.updTimeLine();
-                        //self.intervals = tmp_dict;
-                        //console.log(new Date(self.intervals[0][0].startOffset * 1000));
-                        //console.log(new Date(self.intervals[0][0].stopOffset * 1000));
                     },
                     error: function (data) {
                         console.log("Ошибка");

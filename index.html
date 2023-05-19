@@ -81,29 +81,9 @@
 
             </div>
             <!--mnemonic-->
-            
-
             <div class="col-lg-5 col-md-12 col-sm-12 col-12">
                 <div id="SVG" data-bind="if: isSVGvisible" class="container-fluid border border-dark svg-container">
-                    <figure id="figure" class="figure">
-                        <div data-bind="foreach: mnemoSquares">
-                            <svg viewBox="0 0 160 75" data-bind="style: { position: 'absolute', top: top, left: left, width: width, height: height }, attr: { id: Title }">
-                                <g>
-                                    <rect x="0" y="0" width="155" height="70" rx="5" ry="5" data-bind="attr: { fill: fill(), stroke: stroke() }"></rect>
-                                    <circle cx="140" cy="10" r="5" stroke="black" strokeWidth=1 data-bind="attr: { fill: Circle.css() }"></circle>
-
-                                    <text text-anchor="middle" x="75" y="18" data-bind="text: Title"></text>
-
-                                    <foreignObject x="5" y="25" width="145" height="50" style="font-size: 14px; line-height: 20px;">
-                                        <text data-bind="text: text"></text>
-                                    </foreignObject>
-                                </g>
-                            </svg>
-                        </div>
-                    </figure>
-
-
-
+                    <figure id="figure" class="figure"></figure>
 
                     <div class="legend-kbv">
                         <span></span>
@@ -116,7 +96,7 @@
                 </div>
 
             </div>
-        
+
         </div>
 
         <!--row for selected time-->

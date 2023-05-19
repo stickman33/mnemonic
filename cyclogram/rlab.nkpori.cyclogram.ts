@@ -243,17 +243,15 @@ namespace rlab.nkpori {
 
         drawBKUSNILines() {
             let self = this;
-            const svgDiv = document.getElementById("figure");
-            //const svg = document.getElementById("БКУСНИ");
+            //svgLines.remove();
 
-            //let div = document.getElementById("SVG").getBoundingClientRect();
+            const svgDiv = document.getElementById("figure");
+
+            
             const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             svg.setAttribute("width", "100%");
             svg.setAttribute("height", "100%");
-
-
-
-            
+            svg.setAttribute("id", "lines");
 
 
             self.mnemoSquares().forEach(square => {
@@ -297,9 +295,24 @@ namespace rlab.nkpori {
                 svg.appendChild(kbvLine);
                 svg.appendChild(pollLine);
             });
+
+            //let lineHalfset = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            //lineHalfset.setAttribute("stroke", "black");
+            //lineHalfset.setAttribute("stroke-width", "2");
+            //lineHalfset.setAttribute("z-index", "100");
+
+            //lineHalfset.setAttribute("x1", "6px");
+            //lineHalfset.setAttribute("y1", "270px");
+
+            //lineHalfset.setAttribute("x2", "155px");
+            //lineHalfset.setAttribute("y2", "270px");
+
+            //svg.appendChild(lineHalfset);
+
             //svg.appendChild(pollLine);
             svgDiv.appendChild(svg);
             //document.body.appendChild(svg);
+            self.updBKUSNIlines();
         }
 
 
@@ -308,8 +321,8 @@ namespace rlab.nkpori {
 
 
             self.mnemoSquares().forEach(square => {
-                const kbvLine = document.getElementById(`KbvLine_${square.index}`);
-                const pollLine = document.getElementById(`PollLine_${square.index}`);
+                let kbvLine = document.getElementById(`KbvLine_${square.index}`);
+                let pollLine = document.getElementById(`PollLine_${square.index}`);
                 //const pollLine = document.getElementById("PollLine");
 
                 if (square.Title != "БКУСНИ") {
@@ -330,6 +343,7 @@ namespace rlab.nkpori {
                 }
 
             });
+
         }
 
         calcLineCoordinates(squareIndex: number, squareTitle: string, lineType: string) {
@@ -471,8 +485,107 @@ namespace rlab.nkpori {
             self.updBKUSNIlines();
         }
 
+        buildSVGsquares() {
+            let self = this;
+            const elemFigure = document.getElementById("figure");
+            let fragment = document.createDocumentFragment();
+            let elemDiv = document.createElement("div");
+            elemDiv.setAttribute("id", "squares")
+            let svgns = "http://www.w3.org/2000/svg";
 
-        drawSVGSquare() {
+            self.mnemoSquares().forEach(square => {
+                let elemSVG = document.createElementNS(svgns, "svg");
+                elemSVG.setAttribute("viewBox", "0 0 160 75");
+                let svgBinding = "style: { 'position': 'absolute', 'top': top, 'left': left, 'width': width, 'height': height }";
+                elemSVG.setAttribute("id", square.Title);
+                elemSVG.setAttribute("data-bind", svgBinding);
+                let svgBindingContext = {
+                    top: square.top,
+                    left: square.left,
+                    width: square.width,
+                    height: square.height
+                };
+                ko.applyBindings(svgBindingContext, elemSVG);
+
+                let elemGroup = document.createElementNS(svgns, "g");
+                let groupElements = [];
+                let elemRect = document.createElementNS(svgns, "rect");
+                let elemCircle = document.createElementNS(svgns, "circle");
+                let elemTextTitle = document.createElementNS(svgns, "text");
+                let elemForeignObject = document.createElementNS(svgns, "foreignObject");
+                let elemTextInObject = document.createElement("text");
+
+                elemRect.setAttribute("x", "0");
+                elemRect.setAttribute("y", "0");
+                elemRect.setAttribute("width", "155");
+                elemRect.setAttribute("height", "70");
+                elemRect.setAttribute("rx", "5");
+                elemRect.setAttribute("ry", "5");
+                let rectBinding = "attr: { 'fill': fill, 'stroke': stroke }";
+                elemRect.setAttribute("data-bind", rectBinding);
+                let rectBindingContext = {
+                    fill: square.fill,
+                    stroke: square.stroke
+                };
+                ko.applyBindings(rectBindingContext, elemRect);
+
+                elemCircle.setAttribute("cx", "140");
+                elemCircle.setAttribute("cy", "10");
+                elemCircle.setAttribute("r", "5");
+                elemCircle.setAttribute("stroke", "black");
+                elemCircle.setAttribute("strokeWidth", "1");
+                let circleBinding = "attr: { 'fill': fill }";
+                elemCircle.setAttribute("data-bind", circleBinding);
+                let circleBindingContext = {
+                    fill: square.Circle.css
+                };
+                ko.applyBindings(circleBindingContext, elemCircle);
+
+
+                elemTextTitle.setAttribute("text-anchor", "middle");
+                elemTextTitle.setAttribute("x", "75");
+                elemTextTitle.setAttribute("y", "18");
+                elemTextTitle.textContent = square.Title;
+
+                elemForeignObject.setAttribute("x", "5");
+                elemForeignObject.setAttribute("y", "25");
+                elemForeignObject.setAttribute("width", "145");
+                elemForeignObject.setAttribute("height", "50");
+                elemForeignObject.setAttribute("style", "font-size: 14px; line-height: 20px;");
+
+                let textInObjBinding = `text: text`;
+                elemTextInObject.setAttribute("data-bind", textInObjBinding);
+                let bindingContext = {
+                    text: square.text
+                };
+                ko.applyBindings(bindingContext, elemTextInObject);
+
+                elemForeignObject.appendChild(elemTextInObject);
+                groupElements.push(elemRect, elemCircle, elemTextTitle, elemForeignObject);
+
+                //if (square.Title === "ГАЛС") {
+                //    let elemLine = document.createElementNS(svgns, "line");
+                //    elemLine.setAttribute("x1", "0");
+                //    elemLine.setAttribute("y1", `${square.height() / 2}`);
+                //    elemLine.setAttribute("x2", `${square.width()}`);
+                //    elemLine.setAttribute("y2", `${square.height() / 2}`);
+                //    elemLine.setAttribute("stroke", "black");  
+                //    elemLine.setAttribute("stroke-width", "1");
+                //    groupElements.push(elemLine);
+                //}
+
+                for (let element of groupElements) {
+                    elemGroup.appendChild(element);
+                }
+                elemSVG.appendChild(elemGroup);
+                elemDiv.appendChild(elemSVG);
+            });
+
+            fragment.appendChild(elemDiv);
+            elemFigure.appendChild(fragment);
+        }
+
+        calcSVGSquares() {
             let self = this;
             let squares = [];
             let squareWidth = self.calcSVGSquareWidth();
@@ -482,7 +595,6 @@ namespace rlab.nkpori {
             let countRow = 0;
             let square: Square;
             let squareIndex = 0;
-
 
             self.instruments().forEach(instr => {
                 if (instr.Title.toString() == "БКУСНИ") {
@@ -500,8 +612,9 @@ namespace rlab.nkpori {
                         index: 5
                     });
 
-                    return squares.push(square);
-                } else {
+                return squares.push(square);
+                }
+                else {
                     square = ({
                         GUID: instr.GUID.toString(),
                         Title: instr.Title.toString(),
@@ -677,8 +790,6 @@ namespace rlab.nkpori {
             let self = this;
             let count = 1;
 
-
-
             for (var key in self.intervals) {
                 var value = self.intervals[key];
                 //value.forEach(val => {
@@ -710,6 +821,9 @@ namespace rlab.nkpori {
 
         GetIntervals(guid: string) {
             let self = this;
+            var svgLines = document.getElementById("lines");
+            var divSqaures = document.getElementById("squares");
+
 
             rlab.services.Request({
                 url: `../services/StateMachine.svc/CalculationNI?sequence=${guid}`,
@@ -724,23 +838,27 @@ namespace rlab.nkpori {
                     data.forEach(instr => {
                         tmp_intervals = instr.Value;
                         self.intervals[instr.Key] = tmp_intervals;
-
-                        //console.log(tmp_intervals);
-                        //console.log(tmp_dict);
-                        //console.log(instr.Key);
-                        //console.log(instr.Value);
                     });
 
-                    self.drawSVGSquare();
-                    self.drawBKUSNILines();
+
+
+                    self.calcSVGSquares();
+
+                    if (divSqaures) {
+                        divSqaures.remove();
+                    }
+
+                    self.buildSVGsquares();
+
+                    if (svgLines) {
+                        self.updBKUSNIlines();
+                    }
+                    else {
+                        self.drawBKUSNILines();
+                    }
                     self.updSVGSquareState();
                     self.updTimeLine();
 
-
-
-                    //self.intervals = tmp_dict;
-                    //console.log(new Date(self.intervals[0][0].startOffset * 1000));
-                    //console.log(new Date(self.intervals[0][0].stopOffset * 1000));
                     
                 },
                 error: function (data) {
