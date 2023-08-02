@@ -5,3 +5,10 @@ D:\my projects\ion-nnk-state-mnemonic\obj\Debug\ion-nnk-state-mnemonic.csproj.As
 D:\my projects\ion-nnk-state-mnemonic\obj\Debug\ion-nnk-state-mnemonic.csproj.CoreCompileInputs.cache
 D:\my projects\ion-nnk-state-mnemonic\obj\Debug\TypeScriptHTMLApp1.dll
 D:\my projects\ion-nnk-state-mnemonic\obj\Debug\TypeScriptHTMLApp1.pdb
+C:\Users\timof\OneDrive\Документы\ion-nnk-state-mnemonic\bin\TypeScriptHTMLApp1.dll.config
+C:\Users\timof\OneDrive\Документы\ion-nnk-state-mnemonic\bin\TypeScriptHTMLApp1.dll
+C:\Users\timof\OneDrive\Документы\ion-nnk-state-mnemonic\bin\TypeScriptHTMLApp1.pdb
+C:\Users\timof\OneDrive\Документы\ion-nnk-state-mnemonic\obj\Debug\ion-nnk-state-mnemonic.csproj.AssemblyReference.cache
+C:\Users\timof\OneDrive\Документы\ion-nnk-state-mnemonic\obj\Debug\ion-nnk-state-mnemonic.csproj.CoreCompileInputs.cache
+C:\Users\timof\OneDrive\Документы\ion-nnk-state-mnemonic\obj\Debug\TypeScriptHTMLApp1.dll
+C:\Users\timof\OneDrive\Документы\ion-nnk-state-mnemonic\obj\Debug\TypeScriptHTMLApp1.pdb

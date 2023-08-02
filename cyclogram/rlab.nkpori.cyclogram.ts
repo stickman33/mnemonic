@@ -2,6 +2,8 @@
 ///<reference path="../lib/rlab.nkpori.config.ts" />
 
 
+
+
 namespace rlab.nkpori {
 
     interface CommandDef {
@@ -18,7 +20,8 @@ namespace rlab.nkpori {
         Offset: ko.Observable<number>,
 
         /// need for timeline
-        begin: Date
+        begin: Date,
+        bitParameters: object
     }
 
     interface State {
@@ -46,7 +49,11 @@ namespace rlab.nkpori {
         x1: string,
         y1: string,
         x2: string,
-        y2: string
+        y2: string,
+        x3: string,
+        y3: string,
+        x4: string,
+        y4: string
     }
 
 
@@ -69,6 +76,8 @@ namespace rlab.nkpori {
         selectedCyclogramGUID: ko.Observable<string>;
         commands: ko.ObservableArray<Command>;
 
+        squareStatus: ko.ObservableArray<boolean>;
+
         cycTablePage = 1;
 
         mnemoSquares: ko.ObservableArray<Square>;
@@ -90,6 +99,7 @@ namespace rlab.nkpori {
 
             this.states = [];
 
+            this.squareStatus = ko.observableArray([])
 
             this.intervals = [];
 
@@ -195,6 +205,7 @@ namespace rlab.nkpori {
             if (legend) {
                 const legendWidth = window.innerWidth * 0.1;
                 legend.style.width = `${legendWidth}px`;
+                legend.style.height = "326px";
             }
         }
 
@@ -243,6 +254,7 @@ namespace rlab.nkpori {
 
         drawBKUSNILines() {
             let self = this;
+            let voidmass: boolean[] = [false, false, false, false, false, false, false, false, false, false, false]
             //svgLines.remove();
 
             const svgDiv = document.getElementById("figure");
@@ -270,26 +282,22 @@ namespace rlab.nkpori {
                 //    //pollLine.setAttribute("id", "PollLine");
 
                 //}
-                const kbvLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                const kbvLine = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
                 kbvLine.setAttribute("stroke", "green");
                 kbvLine.setAttribute("stroke-width", "2");
 
-                kbvLine.setAttribute("x1", "0px");
-                kbvLine.setAttribute("y1", "0px");
+                kbvLine.setAttribute("points", "0,0 0,0 0,0 0,0")
+                kbvLine.setAttribute("fill", "none")
 
-                kbvLine.setAttribute("x2", "0px");
-                kbvLine.setAttribute("y2", "0px");
                 kbvLine.setAttribute("id", `KbvLine_${square.index}`);
 
-                const pollLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                const pollLine = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
                 pollLine.setAttribute("stroke", "blue");
                 pollLine.setAttribute("stroke-width", "2");
 
-                pollLine.setAttribute("x1", "0px");
-                pollLine.setAttribute("y1", "0px");
+                pollLine.setAttribute("points", "0,0 0,0 0,0 0,0")
+                pollLine.setAttribute("fill", "none")
 
-                pollLine.setAttribute("x2", "0px");
-                pollLine.setAttribute("y2", "0px");
                 pollLine.setAttribute("id", `PollLine_${square.index}`);
 
                 svg.appendChild(kbvLine);
@@ -312,36 +320,32 @@ namespace rlab.nkpori {
             //svg.appendChild(pollLine);
             svgDiv.appendChild(svg);
             //document.body.appendChild(svg);
-            self.updBKUSNIlines();
+            self.updBKUSNIlines(voidmass);
         }
 
 
-        updBKUSNIlines() {
+        updBKUSNIlines(arr: object) {
             let self = this;
-
-
+            let arrStatus = arr;
             self.mnemoSquares().forEach(square => {
-                let kbvLine = document.getElementById(`KbvLine_${square.index}`);
-                let pollLine = document.getElementById(`PollLine_${square.index}`);
-                //const pollLine = document.getElementById("PollLine");
+                if (arrStatus[square.index] === true) { 
+                    let kbvLine = document.getElementById(`KbvLine_${square.index}`);
+                    let pollLine = document.getElementById(`PollLine_${square.index}`);
+                    //const pollLine = document.getElementById("PollLine");
 
-                if (square.Title != "БКУСНИ") {
+                    if (square.Title != "БКУСНИ" ) {
+                        
+                        let kbvLineCoords = self.calcLineCoordinates(square.index, square.Title, "kbv");
+                        kbvLine.setAttribute("points", `${kbvLineCoords.x1},${kbvLineCoords.y1} 
+    ${kbvLineCoords.x2},${kbvLineCoords.y2} ${kbvLineCoords.x3},${kbvLineCoords.y3} ${kbvLineCoords.x4},${kbvLineCoords.y4}`);
 
-                    let kbvLineCoords = self.calcLineCoordinates(square.index, square.Title, "kbv");
-                    kbvLine.setAttribute("x1", kbvLineCoords.x1);
-                    kbvLine.setAttribute("y1", kbvLineCoords.y1);
-                    kbvLine.setAttribute("x2", kbvLineCoords.x2);
-                    kbvLine.setAttribute("y2", kbvLineCoords.y2);
+                        let pollLineCoords = self.calcLineCoordinates(square.index, square.Title, "poll");
+                        pollLine.setAttribute("points", `${pollLineCoords.x1},${pollLineCoords.y1} 
+    ${pollLineCoords.x2},${pollLineCoords.y2} ${pollLineCoords.x3},${pollLineCoords.y3} ${pollLineCoords.x4},${pollLineCoords.y4}`);
 
-                    let pollLineCoords = self.calcLineCoordinates(square.index, square.Title, "poll");
-                    pollLine.setAttribute("x1", pollLineCoords.x1);
-                    pollLine.setAttribute("y1", pollLineCoords.y1);
-                    pollLine.setAttribute("x2", pollLineCoords.x2);
-                    pollLine.setAttribute("y2", pollLineCoords.y2);
-
+                    }
 
                 }
-
             });
 
         }
@@ -350,6 +354,8 @@ namespace rlab.nkpori {
             let self = this;
             let offset = 0;
             let lineOffset = 0;
+            let offsetWight = 0; // TO FIX WIGHT BETWEN TWO LINES
+            let fixingOffset = 0; // TO FIX SWAPPING GREEN WITH BLUE IN THE MIDDLE TOP OR BOT
 
             let bkusniCoords = self.getRectPos("БКУСНИ");
             //let bkusniTop = self.countMiddleCoord("БКУСНИ", "top");
@@ -367,27 +373,53 @@ namespace rlab.nkpori {
                 x1: "",
                 y1: "",
                 x2: "",
-                y2: ""
+                y2: "",
+                x3: "",
+                y3: "",
+                x4: "",
+                y4: ""
             }
 
             if (lineType == 'kbv') {
-                switch (squareIndex) {
+                switch (squareIndex) { // 0,1,2,3 - TOP SQUARES, LINE TO THEM IS GREEN, 'CAUSE OF 'KBV'
                     case 0:
+                        lineOffset = 10;
+                        offsetWight = 5;
+                        offset = bkusniCoords.width / 16;
+                        break;
                     case 7:
                         lineOffset = 10;
+                        offsetWight = -5;
                         offset = bkusniCoords.width / 16;
                         break;
                     case 1:
+                        offset = bkusniCoords.width * 5 / 16;
+                        offsetWight = 5;
+                        break;
                     case 8:
                         offset = bkusniCoords.width * 5 / 16;
+                        offsetWight = -5;
                         break;
                     case 2:
+                        offset = bkusniCoords.width * 9 / 16;
+                        offsetWight = -10;
+                        fixingOffset = 10;
+                        break;
                     case 9:
                         offset = bkusniCoords.width * 9 / 16;
+                        offsetWight = 10;
+                        fixingOffset = -10;
                         break;
                     case 3:
+                        lineOffset = -40;
+                        offsetWight = -5;
+                        fixingOffset = 5;
+                        offset = bkusniCoords.width * 13 / 16;
+                        break;
                     case 10:
                         lineOffset = -40;
+                        offsetWight = 5;
+                        fixingOffset = -5;
                         offset = bkusniCoords.width * 13 / 16;
                         break;
                 }
@@ -396,26 +428,44 @@ namespace rlab.nkpori {
 
                 switch (squareIndex) {
                     case 0:
+                        lineOffset = 40;
+                        offset = bkusniCoords.width * 3 / 16;
+                        break;
                     case 7:
                         lineOffset = 40;
                         offset = bkusniCoords.width * 3 / 16;
                         break;
                     case 1:
+                        lineOffset = 10;
+                        offset = (bkusniCoords.width * 7 / 16) - lineOffset;
+                        break;
                     case 8:
                         lineOffset = 10;
                         offset = (bkusniCoords.width * 7 / 16) - lineOffset;
                         break;
                     case 2:
+                        lineOffset = 10;
+                        fixingOffset = 5;
+                        offset = (bkusniCoords.width * 11 / 16) - lineOffset;
+                        break;
                     case 9:
                         lineOffset = 10;
+                        fixingOffset = -5;
                         offset = (bkusniCoords.width * 11 / 16) - lineOffset;
                         break;
                     case 3:
+                        lineOffset = -10;
+                        fixingOffset = 5;
+                        offset = bkusniCoords.width * 15 / 16;
+                        break;
                     case 10:
                         lineOffset = -10;
+                        fixingOffset = -5;
                         offset = bkusniCoords.width * 15 / 16;
                         break;
                     case 4:
+                        lineOffset = 5;
+                        break;
                     case 6:
                         lineOffset = 5;
                         break;
@@ -425,35 +475,74 @@ namespace rlab.nkpori {
 
 
             if (squareIndex != 4 && squareIndex != 5 && squareIndex != 6) {
-                if (squareIndex < 4) {
+                if (squareIndex === 1 || squareIndex === 2) { // TOP MID
                     lineCoords = {
-                        x1: `${bkusniCoords.x + offset}px`,
-                        y1: `${bkusniTop[1]}px`,
-                        x2: `${squareBot[0] + lineOffset}px`,
-                        y2: `${squareBot[1]}px`
+                        x1: `${bkusniCoords.x + offset}`,
+                        y1: `${bkusniTop[1]}`,
+                        x2: `${bkusniCoords.x + offset}`,
+                        y2: `${bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 + offsetWight + fixingOffset}`,
+                        x3: `${squareBot[0] + lineOffset}`,
+                        y3: `${bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 + offsetWight + fixingOffset}`,
+                        x4: `${squareBot[0] + lineOffset}`,
+                        y4: `${squareBot[1]}`
                     }
-                    
-                } else {
+
+                } else if (squareIndex === 0 || squareIndex === 3) { // TOP FACE
                     lineCoords = {
-                        x1: `${bkusniCoords.x + offset}px`,
-                        y1: `${bkusniBot[1]}px`,
-                        x2: `${squareTop[0] + lineOffset}px`,
-                        y2: `${squareTop[1]}px`
+                        x1: `${bkusniCoords.x + offset}`,
+                        y1: `${bkusniTop[1]}`,
+                        x2: `${bkusniCoords.x + offset}`,
+                        y2: `${bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 - (bkusniTop[1] - bkusniBot[1]) / 4 + offsetWight + fixingOffset}`,
+                        x3: `${squareBot[0] + lineOffset}`,
+                        y3: `${bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 - (bkusniTop[1] - bkusniBot[1]) / 4 + offsetWight + fixingOffset}`,
+                        x4: `${squareBot[0] + lineOffset}`,
+                        y4: `${squareBot[1]}`
                     }
+                } else if (squareIndex === 7 || squareIndex === 10) { // BOT FACE
+                    lineCoords = {
+                        x1: `${bkusniCoords.x + offset}`,
+                        y1: `${bkusniBot[1]}`,
+                        x2: `${bkusniCoords.x + offset}`,
+                        y2: `${bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 - (bkusniBot[1] - bkusniTop[1]) / 4 + offsetWight + fixingOffset}`, // (bkusniTop[1] - bkusniBot[1]) * 2 + (bkusniTop[1] - bkusniBot[1]) * 4 + offsetWight + fixingOffset
+                        x3: `${squareTop[0] + lineOffset}`,
+                        y3: `${bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 - (bkusniBot[1] - bkusniTop[1]) / 4 + offsetWight + fixingOffset}`, // (bkusniTop[1] - bkusniBot[1]) * 2 + (bkusniTop[1] - bkusniBot[1]) * 4 + offsetWight + fixingOffset
+                        x4: `${squareTop[0] + lineOffset}`,
+                        y4: `${squareTop[1]}`
+                    }
+                } else if (squareIndex === 8 || squareIndex === 9) { // BOT MID
+                    lineCoords = {
+                        x1: `${bkusniCoords.x + offset}`,
+                        y1: `${bkusniBot[1]}`,
+                        x2: `${bkusniCoords.x + offset}`,
+                        y2: `${bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 + offsetWight + fixingOffset}`,
+                        x3: `${squareBot[0] + lineOffset}`,
+                        y3: `${bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 + offsetWight + fixingOffset}`,
+                        x4: `${squareTop[0] + lineOffset}`,
+                        y4: `${squareTop[1]}`
+                    }
+
                 }
             } else if (squareIndex === 4) {
                 lineCoords = {
-                    x1: `${bkusniLSide[0]}px`,
-                    y1: `${bkusniLSide[1] + lineOffset}px`,
-                    x2: `${squareRSide[0]}px`,
-                    y2: `${squareRSide[1] + lineOffset}px`
+                    x1: `${bkusniLSide[0]}`,
+                    y1: `${bkusniLSide[1] + lineOffset}`,
+                    x2: `${bkusniLSide[0]}`,
+                    y2: `${bkusniLSide[1] + lineOffset}`,
+                    x3: '', 
+                    y3: '',
+                    x4: `${squareRSide[0]}`,
+                    y4: `${squareRSide[1] + lineOffset}`
                 }
             } else if (squareIndex === 6) {
                 lineCoords = {
-                    x1: `${bkusniRSide[0]}px`,
-                    y1: `${bkusniRSide[1] + lineOffset}px`,
-                    x2: `${squareLSide[0]}px`,
-                    y2: `${squareLSide[1] + lineOffset}px`
+                    x1: `${bkusniRSide[0]}`,
+                    y1: `${bkusniRSide[1] + lineOffset}`,
+                    x2: `${bkusniRSide[0]}`,
+                    y2: `${bkusniRSide[1] + lineOffset}`,
+                    x3: '',
+                    y3: '',
+                    x4: `${squareLSide[0]}`,
+                    y4: `${squareLSide[1] + lineOffset}`
                 }
             }
 
@@ -465,10 +554,10 @@ namespace rlab.nkpori {
             let squareWidth = (containerWidth - 30) / 5;
 
             if (squareWidth > 165) {
-                return 165;
+                return squareWidth;
             }
             else if (squareWidth < 115) {
-                return 115;
+                return squareWidth;
             }
             else {
                 return (containerWidth - 30) / 5;
@@ -482,7 +571,7 @@ namespace rlab.nkpori {
             self.mnemoSquares().forEach(square => {
                 square.height(squareWidth * 0.4375);
             });
-            self.updBKUSNIlines();
+            self.updBKUSNIlines(self.squareStatus);
         }
 
         buildSVGsquares() {
@@ -725,6 +814,7 @@ namespace rlab.nkpori {
 
         updSVGSquareState() {
             let self = this;
+            self.squareStatus.destroy;
 
             for (var key in self.intervals) {
                 var value = self.intervals[key];
@@ -754,9 +844,13 @@ namespace rlab.nkpori {
 
                                             if (state.Title == "Отключен") {
                                                 square.fill("#ebebeb");
+                                                console.log(square);
+                                                self.squareStatus.push(false);
                                             }
                                             else {
                                                 square.fill("#a8c6f7");
+                                                self.squareStatus.push(true);
+
                                             }
 
                                             if (val.GUIDState == "2e85bad5-6a49-ed11-8edc-00155d09ea1d") {
@@ -770,7 +864,7 @@ namespace rlab.nkpori {
                                     });
                                 }
                                 else if (val.GUIDState == "00000000-0000-0000-0000-000000000000") {
-                                    self.updBKUSNIlines();
+                                    self.updBKUSNIlines(self.squareStatus);
                                 }
                             });
 
@@ -789,6 +883,7 @@ namespace rlab.nkpori {
         updTimeLine() {
             let self = this;
             let count = 1;
+
 
             for (var key in self.intervals) {
                 var value = self.intervals[key];
@@ -966,7 +1061,7 @@ namespace rlab.nkpori {
                 success: function (data) {
                     let tmp_data: Command[] = [];
                     data.forEach(com => {
-
+                        
                         ///kostyl' !!!!!!
                         //com.Instrument = Instr[0].key 
 
@@ -975,8 +1070,10 @@ namespace rlab.nkpori {
                             GUIDSequenceItemDef: com.GUIDSequenceItemDef,
                             GUIDSequence: com.GUIDSequence,
                             Offset: ko.observable(com.Offset * 1000),
+                            begin: new Date(com.Offset * 1000),
+                            bitParameters: com.bitParameters
 
-                            begin: new Date(com.Offset * 1000)
+
                         }
 
                         /*item[com.Instrument + "_value"] = com.Code*//*;*/
@@ -1013,7 +1110,7 @@ namespace rlab.nkpori {
 
 
                     //console.log(self.dateLimitParams().end());
-                    //console.log(self.commands());
+                    console.log(self.commands());
 
                 },
                 error: function (data) {
