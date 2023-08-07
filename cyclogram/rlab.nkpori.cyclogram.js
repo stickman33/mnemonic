@@ -94,8 +94,7 @@ var rlab;
                 var legend = document.getElementById("legend");
                 if (legend) {
                     var legendWidth = window.innerWidth * 0.1;
-                    legend.style.width = "".concat(legendWidth, "px");
-                    legend.style.height = "326px";
+                    legend.style.width = legendWidth + "px";
                 }
             };
             CyclogramModel.prototype.getRectPos = function (id) {
@@ -155,18 +154,22 @@ var rlab;
                     //    line.setAttribute("id", "KbvLine");
                     //    //pollLine.setAttribute("id", "PollLine");
                     //}
-                    var kbvLine = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+                    var kbvLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                     kbvLine.setAttribute("stroke", "green");
                     kbvLine.setAttribute("stroke-width", "2");
-                    kbvLine.setAttribute("points", "0,0 0,0 0,0 0,0");
-                    kbvLine.setAttribute("fill", "none");
-                    kbvLine.setAttribute("id", "KbvLine_".concat(square.index));
-                    var pollLine = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+                    kbvLine.setAttribute("x1", "0px");
+                    kbvLine.setAttribute("y1", "0px");
+                    kbvLine.setAttribute("x2", "0px");
+                    kbvLine.setAttribute("y2", "0px");
+                    kbvLine.setAttribute("id", "KbvLine_" + square.index);
+                    var pollLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
                     pollLine.setAttribute("stroke", "blue");
                     pollLine.setAttribute("stroke-width", "2");
-                    pollLine.setAttribute("points", "0,0 0,0 0,0 0,0");
-                    pollLine.setAttribute("fill", "none");
-                    pollLine.setAttribute("id", "PollLine_".concat(square.index));
+                    pollLine.setAttribute("x1", "0px");
+                    pollLine.setAttribute("y1", "0px");
+                    pollLine.setAttribute("x2", "0px");
+                    pollLine.setAttribute("y2", "0px");
+                    pollLine.setAttribute("id", "PollLine_" + square.index);
                     svg.appendChild(kbvLine);
                     svg.appendChild(pollLine);
                 });
@@ -187,14 +190,20 @@ var rlab;
             CyclogramModel.prototype.updBKUSNIlines = function () {
                 var self = this;
                 self.mnemoSquares().forEach(function (square) {
-                    var kbvLine = document.getElementById("KbvLine_".concat(square.index));
-                    var pollLine = document.getElementById("PollLine_".concat(square.index));
+                    var kbvLine = document.getElementById("KbvLine_" + square.index);
+                    var pollLine = document.getElementById("PollLine_" + square.index);
                     //const pollLine = document.getElementById("PollLine");
                     if (square.Title != "БКУСНИ") {
                         var kbvLineCoords = self.calcLineCoordinates(square.index, square.Title, "kbv");
-                        kbvLine.setAttribute("points", "".concat(kbvLineCoords.x1, ",").concat(kbvLineCoords.y1, " \n").concat(kbvLineCoords.x2, ",").concat(kbvLineCoords.y2, " ").concat(kbvLineCoords.x3, ",").concat(kbvLineCoords.y3, " ").concat(kbvLineCoords.x4, ",").concat(kbvLineCoords.y4));
+                        kbvLine.setAttribute("x1", kbvLineCoords.x1);
+                        kbvLine.setAttribute("y1", kbvLineCoords.y1);
+                        kbvLine.setAttribute("x2", kbvLineCoords.x2);
+                        kbvLine.setAttribute("y2", kbvLineCoords.y2);
                         var pollLineCoords = self.calcLineCoordinates(square.index, square.Title, "poll");
-                        pollLine.setAttribute("points", "".concat(pollLineCoords.x1, ",").concat(pollLineCoords.y1, " \n").concat(pollLineCoords.x2, ",").concat(pollLineCoords.y2, " ").concat(pollLineCoords.x3, ",").concat(pollLineCoords.y3, " ").concat(pollLineCoords.x4, ",").concat(pollLineCoords.y4));
+                        pollLine.setAttribute("x1", pollLineCoords.x1);
+                        pollLine.setAttribute("y1", pollLineCoords.y1);
+                        pollLine.setAttribute("x2", pollLineCoords.x2);
+                        pollLine.setAttribute("y2", pollLineCoords.y2);
                     }
                 });
             };
@@ -202,8 +211,6 @@ var rlab;
                 var self = this;
                 var offset = 0;
                 var lineOffset = 0;
-                var offsetWight = 0; // TO FIX WIGHT BETWEN TWO LINES
-                var fixingOffset = 0; // TO FIX SWAPPING GREEN WITH BLUE IN THE MIDDLE TOP OR BOT
                 var bkusniCoords = self.getRectPos("БКУСНИ");
                 //let bkusniTop = self.countMiddleCoord("БКУСНИ", "top");
                 var bkusniTop = self.countMiddleCoord("БКУСНИ", "top");
@@ -218,52 +225,26 @@ var rlab;
                     x1: "",
                     y1: "",
                     x2: "",
-                    y2: "",
-                    x3: "",
-                    y3: "",
-                    x4: "",
-                    y4: ""
+                    y2: ""
                 };
                 if (lineType == 'kbv') {
-                    switch (squareIndex) { // 0,1,2,3 - TOP SQUARES, LINE TO THEM IS GREEN, 'CAUSE OF 'KBV'
+                    switch (squareIndex) {
                         case 0:
-                            lineOffset = 10;
-                            offsetWight = 5;
-                            offset = bkusniCoords.width / 16;
-                            break;
                         case 7:
                             lineOffset = 10;
-                            offsetWight = -5;
                             offset = bkusniCoords.width / 16;
                             break;
                         case 1:
-                            offset = bkusniCoords.width * 5 / 16;
-                            offsetWight = 5;
-                            break;
                         case 8:
                             offset = bkusniCoords.width * 5 / 16;
-                            offsetWight = -5;
                             break;
                         case 2:
-                            offset = bkusniCoords.width * 9 / 16;
-                            offsetWight = -10;
-                            fixingOffset = 10;
-                            break;
                         case 9:
                             offset = bkusniCoords.width * 9 / 16;
-                            offsetWight = 10;
-                            fixingOffset = -10;
                             break;
                         case 3:
-                            lineOffset = -40;
-                            offsetWight = -5;
-                            fixingOffset = 5;
-                            offset = bkusniCoords.width * 13 / 16;
-                            break;
                         case 10:
                             lineOffset = -40;
-                            offsetWight = 5;
-                            fixingOffset = -5;
                             offset = bkusniCoords.width * 13 / 16;
                             break;
                     }
@@ -271,121 +252,63 @@ var rlab;
                 else {
                     switch (squareIndex) {
                         case 0:
-                            lineOffset = 40;
-                            offset = bkusniCoords.width * 3 / 16;
-                            break;
                         case 7:
                             lineOffset = 40;
                             offset = bkusniCoords.width * 3 / 16;
                             break;
                         case 1:
-                            lineOffset = 10;
-                            offset = (bkusniCoords.width * 7 / 16) - lineOffset;
-                            break;
                         case 8:
                             lineOffset = 10;
                             offset = (bkusniCoords.width * 7 / 16) - lineOffset;
                             break;
                         case 2:
-                            lineOffset = 10;
-                            fixingOffset = 5;
-                            offset = (bkusniCoords.width * 11 / 16) - lineOffset;
-                            break;
                         case 9:
                             lineOffset = 10;
-                            fixingOffset = -5;
                             offset = (bkusniCoords.width * 11 / 16) - lineOffset;
                             break;
                         case 3:
-                            lineOffset = -10;
-                            fixingOffset = 5;
-                            offset = bkusniCoords.width * 15 / 16;
-                            break;
                         case 10:
                             lineOffset = -10;
-                            fixingOffset = -5;
                             offset = bkusniCoords.width * 15 / 16;
                             break;
                         case 4:
-                            lineOffset = 5;
-                            break;
                         case 6:
                             lineOffset = 5;
                             break;
                     }
                 }
                 if (squareIndex != 4 && squareIndex != 5 && squareIndex != 6) {
-                    if (squareIndex === 1 || squareIndex === 2) { // TOP MID
+                    if (squareIndex < 4) {
                         lineCoords = {
-                            x1: "".concat(bkusniCoords.x + offset),
-                            y1: "".concat(bkusniTop[1]),
-                            x2: "".concat(bkusniCoords.x + offset),
-                            y2: "".concat(bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 + offsetWight + fixingOffset),
-                            x3: "".concat(squareBot[0] + lineOffset),
-                            y3: "".concat(bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 + offsetWight + fixingOffset),
-                            x4: "".concat(squareBot[0] + lineOffset),
-                            y4: "".concat(squareBot[1])
+                            x1: bkusniCoords.x + offset + "px",
+                            y1: bkusniTop[1] + "px",
+                            x2: squareBot[0] + lineOffset + "px",
+                            y2: squareBot[1] + "px"
                         };
                     }
-                    else if (squareIndex === 0 || squareIndex === 3) { // TOP FACE
+                    else {
                         lineCoords = {
-                            x1: "".concat(bkusniCoords.x + offset),
-                            y1: "".concat(bkusniTop[1]),
-                            x2: "".concat(bkusniCoords.x + offset),
-                            y2: "".concat(bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 - (bkusniTop[1] - bkusniBot[1]) / 4 + offsetWight + fixingOffset),
-                            x3: "".concat(squareBot[0] + lineOffset),
-                            y3: "".concat(bkusniTop[1] + (bkusniTop[1] - bkusniBot[1]) / 2 - (bkusniTop[1] - bkusniBot[1]) / 4 + offsetWight + fixingOffset),
-                            x4: "".concat(squareBot[0] + lineOffset),
-                            y4: "".concat(squareBot[1])
-                        };
-                    }
-                    else if (squareIndex === 7 || squareIndex === 10) { // BOT FACE
-                        lineCoords = {
-                            x1: "".concat(bkusniCoords.x + offset),
-                            y1: "".concat(bkusniBot[1]),
-                            x2: "".concat(bkusniCoords.x + offset),
-                            y2: "".concat(bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 - (bkusniBot[1] - bkusniTop[1]) / 4 + offsetWight + fixingOffset),
-                            x3: "".concat(squareTop[0] + lineOffset),
-                            y3: "".concat(bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 - (bkusniBot[1] - bkusniTop[1]) / 4 + offsetWight + fixingOffset),
-                            x4: "".concat(squareTop[0] + lineOffset),
-                            y4: "".concat(squareTop[1])
-                        };
-                    }
-                    else if (squareIndex === 8 || squareIndex === 9) { // BOT MID
-                        lineCoords = {
-                            x1: "".concat(bkusniCoords.x + offset),
-                            y1: "".concat(bkusniBot[1]),
-                            x2: "".concat(bkusniCoords.x + offset),
-                            y2: "".concat(bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 + offsetWight + fixingOffset),
-                            x3: "".concat(squareBot[0] + lineOffset),
-                            y3: "".concat(bkusniBot[1] + (bkusniBot[1] - bkusniTop[1]) / 2 + offsetWight + fixingOffset),
-                            x4: "".concat(squareTop[0] + lineOffset),
-                            y4: "".concat(squareTop[1])
+                            x1: bkusniCoords.x + offset + "px",
+                            y1: bkusniBot[1] + "px",
+                            x2: squareTop[0] + lineOffset + "px",
+                            y2: squareTop[1] + "px"
                         };
                     }
                 }
                 else if (squareIndex === 4) {
                     lineCoords = {
-                        x1: "".concat(bkusniLSide[0]),
-                        y1: "".concat(bkusniLSide[1] + lineOffset),
-                        x2: "".concat(bkusniLSide[0]),
-                        y2: "".concat(bkusniLSide[1] + lineOffset),
-                        x3: '',
-                        y3: '',
-                        x4: "".concat(squareRSide[0]),
-                        y4: "".concat(squareRSide[1] + lineOffset)
+                        x1: bkusniLSide[0] + "px",
+                        y1: bkusniLSide[1] + lineOffset + "px",
+                        x2: squareRSide[0] + "px",
+                        y2: squareRSide[1] + lineOffset + "px"
                     };
                 }
                 else if (squareIndex === 6) {
                     lineCoords = {
-                        x1: "".concat(bkusniRSide[0]),
-                        y1: "".concat(bkusniRSide[1] + lineOffset),
-                        x2: "".concat(bkusniRSide[0]),
-                        y2: "".concat(bkusniRSide[1] + lineOffset),
-                        x3: '',
-                        y3: '',
-                        x4: "".concat(squareLSide[0]),
-                        y4: "".concat(squareLSide[1] + lineOffset)
+                        x1: bkusniRSide[0] + "px",
+                        y1: bkusniRSide[1] + lineOffset + "px",
+                        x2: squareLSide[0] + "px",
+                        y2: squareLSide[1] + lineOffset + "px"
                     };
                 }
                 return lineCoords;
@@ -394,10 +317,10 @@ var rlab;
                 var containerWidth = document.getElementById("SVG").offsetWidth;
                 var squareWidth = (containerWidth - 30) / 5;
                 if (squareWidth > 165) {
-                    return squareWidth;
+                    return 165;
                 }
                 else if (squareWidth < 115) {
-                    return squareWidth;
+                    return 115;
                 }
                 else {
                     return (containerWidth - 30) / 5;
@@ -519,7 +442,7 @@ var rlab;
                             fill: ko.observable("#ebebeb"),
                             stroke: ko.observable("black"),
                             text: ko.observable("Расчет недоступен"),
-                            top: "".concat(25 + 10, "%"),
+                            top: 25 + 10 + "%",
                             left: "37.5%",
                             width: ko.observable(squareWidth),
                             height: ko.observable(squareWidth * 0.4375),
@@ -535,8 +458,8 @@ var rlab;
                             fill: ko.observable("#ebebeb"),
                             stroke: ko.observable("black"),
                             text: ko.observable("Расчет недоступен"),
-                            top: "".concat(top, "%"),
-                            left: "".concat(left, "%"),
+                            top: top + "%",
+                            left: left + "%",
                             width: ko.observable(squareWidth),
                             height: ko.observable(squareWidth * 0.4375),
                             index: squareIndex
@@ -557,7 +480,7 @@ var rlab;
                                     fill: ko.observable("#ebebeb"),
                                     stroke: ko.observable("black"),
                                     text: ko.observable("Расчет недоступен"),
-                                    top: "".concat(25 + 10, "%"),
+                                    top: 25 + 10 + "%",
                                     left: "0%",
                                     width: ko.observable(squareWidth),
                                     height: ko.observable(squareWidth * 0.4375),
@@ -574,7 +497,7 @@ var rlab;
                                     fill: ko.observable("#ebebeb"),
                                     stroke: ko.observable("black"),
                                     text: ko.observable("Расчет недоступен"),
-                                    top: "".concat(25 + 10, "%"),
+                                    top: 25 + 10 + "%",
                                     left: "75%",
                                     width: ko.observable(squareWidth),
                                     height: ko.observable(squareWidth * 0.4375),
@@ -701,7 +624,7 @@ var rlab;
                 var svgLines = document.getElementById("lines");
                 var divSqaures = document.getElementById("squares");
                 rlab.services.Request({
-                    url: "../services/StateMachine.svc/CalculationNI?sequence=".concat(guid),
+                    url: "../services/StateMachine.svc/CalculationNI?sequence=" + guid,
                     //request: {
                     //    spacecraft: self.spaceCraft(),
                     //},
@@ -802,7 +725,7 @@ var rlab;
                 var self = this;
                 rlab.services.Request({
                     //url: "/services/Planning.svc/command",
-                    url: "../services/Sequences.svc/sequenceitemNI?guidsequence=".concat(guid, "&rows=10000&page=1&sidx=Offset&sord=asc"),
+                    url: "../services/Sequences.svc/sequenceitemNI?guidsequence=" + guid + "&rows=10000&page=1&sidx=Offset&sord=asc",
                     //request: {
                     //    spacecraft: self.spaceCraft(),
                     //    guidCyclogram: guid

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Мнемосхема</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap/font-awesome.css" />
+
+	<!-- Custom styles for sticky footer -->
+	<link href="/css/sticky-footer-navbar.css" rel="stylesheet">
+
+	<!-- <link rel="stylesheet" href="/css/site.css"> -->
+	<script type="text/javascript" src="/lib/jquery/jquery.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="sketch.css">
+
+</head>
+
+<body>
+    <header></header>
+    <main role="main" class="container">
+        <h1 class="mt-5">Мнемосхема</h1>
+    </main>
+	
+	<main role="main" class="container-fluid">
+
+        <!--row for grid and svg mnemonic-->
+        <div class="row m-3">
+            <!--grid-->
+            <div class="col-lg-7 col-md-12 col-sm-12 col-12">
+
+
+
+            </div>
+			
+	<div class="col-lg-5 col-md-12 col-sm-12 col-12">
+		<svg id="SVGG" viewBox="0 0 800 375" xmlns="http://www.w3.org/2000/svg" class="container border border-dark svg-container">
+
+			<g id="ПЭС" transform="translate(1, 0)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" fill="#a8c6f7" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="16" fill="black">ПЭС</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="20" x2="85" y2="20" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 26)">
+					<g transform="translate(0, 0.5)">
+						<circle cx="9" cy="5" r="5" stroke="black" stroke-width="1" fill="lime"></circle>
+						<text text-anchor="start" x="19" y="9.4" font-size="12" fill="black">КБВ</text>
+					</g>
+					<g transform="translate(0, 20.6)">
+						<circle cx="9" cy="5" r="5" stroke="black" stroke-width="1" fill="lime"></circle>
+						<text text-anchor="start" x="19" y="9.4" font-size="12" fill="black">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights--> 
+				<g transform="translate(5, 6.4)">
+					<g transform="translate(75, 0.2)">
+						<circle cx="15" cy="5" r="5" stroke="black" stroke-width="1" fill="yellow"></circle>
+						<text text-anchor="start" x="25" y="9.4" font-size="12" fill="black">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20.1)">
+						<circle cx="15" cy="5" r="5" stroke="black" stroke-width="1" fill="orange"></circle>
+						<text text-anchor="start" x="25" y="9.4" font-size="12" fill="black">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40.2)">
+						<circle cx="15" cy="5" r="5" stroke="black" stroke-width="1" fill="teal"></circle>
+						<text text-anchor="start" x="25" y="9.4" font-size="12" fill="black">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="black">Включен</text>
+			</g>
+
+			<g id="ЛАЭРТ" transform="translate(216, 0)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">ЛАЭРТ</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 26)">
+					<g transform="translate(0, 0.5)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.4" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20.6)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.4" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights--> 
+				<g transform="translate(5, 6.4)">
+					<g transform="translate(75, 0.2)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="9.4" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20.1)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="9.4" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40.2)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="9.4" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="МАЯК" transform="translate(431, 0)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">МАЯК</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="НВК2" transform="translate(644, 0)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">НВК2</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="ОЗОН" transform="translate(1, 130)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">ОЗОН</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="БКУСНИ" transform="translate(323, 130)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#a8c6f7" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">БКУСНИ</text>
+
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+
+				<!--instrument lights-->
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="black">Включен</text>
+			</g>
+
+			<g id="СГ/1" transform="translate(644, 130)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">СГ/1</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="ГАЛС" transform="translate(1, 260)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">ГАЛС</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="СПЭР" transform="translate(216, 260)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">СПЭР</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="ЭСИП ПК1" transform="translate(431, 260)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">ЭСИП ПК1</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" fill="#848a91">Отключен</text>
+			</g>
+
+			<g id="ЭСИП ПК2" transform="translate(644, 260)">
+				<rect x="0" y="0" width="155" height="80" rx="5" ry="5" data-bind="attr: { 'fill': fill, 'stroke': stroke }" fill="#ebebeb" stroke="black"></rect>
+				<g>
+					<text text-anchor="start" x="3" y="18" fill="black">ЭСИП ПК2</text>
+				</g>
+				<!--rectangle borders-->
+				<line x1="0" y1="21" x2="85" y2="21" stroke="black" stroke-width="1" />
+				<line x1="85" y1="0" x2="85" y2="60" stroke="black" stroke-width="1" />
+				<line x1="0" y1="60" x2="155" y2="60" stroke="black" stroke-width="1" />
+				<!--bkusni lights-->
+				<g transform="translate(0, 25)">
+					<g transform="translate(0, 0)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">КБВ</text>
+					</g>
+					<g transform="translate(0, 20)">
+						<circle cx="9" cy="5" r="5" stroke="#848a91" stroke-width="1" fill="none"></circle>
+						<text text-anchor="start" x="19" y="9.25" font-size="12" class="text-styling">Опрос</text>
+					</g>
+				</g>
+				<!--instrument lights-->
+				<g transform="translate(5, 5)">
+					<g transform="translate(75, 0)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 1</text>
+					</g>
+					<g transform="translate(75, 20)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 2</text>
+					</g>
+					<g transform="translate(75, 40)">
+						<circle cx="15" cy="5" r="5" class="circle-styling"></circle>
+						<text text-anchor="start" x="25" y="10" font-size="12" class="text-styling">INFO 3</text>
+					</g>
+				</g>
+				<text text-anchor="start" x="5" y="75" font-size="14" class="text-styling">Отключен</text>
+			</g>
+
+
+
+			<g id="lines">
+				<!-- Определение данных для линий -->
+				<script>
+				  const linesData = [
+					{ color: "green", dasharray: "7", coords: ["M330 130 L330 108 L80 108 L80 80"] },
+					{ color: "blue", dasharray: "", coords: ["M335 130 L335 104 L85 104 L85 80"] },
+					{ color: "green", dasharray: "", coords: ["M330 130 L330 108 L80 108 L80 80"] },
+					{ color: "blue", dasharray: "0", coords: ["M335 130 L335 104 L85 104 L85 80"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M350 130 L350 80"] },
+					{ color: "blue", dasharray: "", coords: ["M355 130 L355 80"] },
+					{ color: "green", dasharray: "", coords: ["M350 130 L350 80"] },
+					{ color: "blue", dasharray: "0", coords: ["M355 130 L355 80"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M445 130 L445 80"] },
+					{ color: "blue", dasharray: "", coords: ["M450 130 L450 80"] },
+					{ color: "green", dasharray: "", coords: ["M445 130 L445 80"] },
+					{ color: "blue", dasharray: "0", coords: ["M450 130 L450 80"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M460 130 L460 104 L720 104 L720 80"] },
+					{ color: "blue", dasharray: "", coords: ["M465 130 L465 108 L725 108 L725 80"] },
+					{ color: "green", dasharray: "", coords: ["M460 130 L460 104 L720 104 L720 80"] },
+					{ color: "blue", dasharray: "0", coords: ["M465 130 L465 108 L725 108 L725 80"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M323 168 L155 168"] },
+					{ color: "blue", dasharray: "", coords: ["M323 173 L155 173"] },
+					{ color: "green", dasharray: "", coords: ["M323 168 L155 168"] },
+					{ color: "blue", dasharray: "0", coords: ["M323 173 L155 173"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M478 168 L644 168"] },
+					{ color: "blue", dasharray: "", coords: ["M478 173 L644 173"] },
+					{ color: "green", dasharray: "", coords: ["M478 168 L644 168"] },
+					{ color: "blue", dasharray: "0", coords: ["M478 173 L644 173"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M330 210 L330 234 L80 234 L80 260"] },
+					{ color: "blue", dasharray: "", coords: ["M335 210 L335 238 L85 238 L85 260"] },
+					{ color: "green", dasharray: "", coords: ["M330 210 L330 234 L80 234 L80 260"] },
+					{ color: "blue", dasharray: "0", coords: ["M335 210 L335 238 L85 238 L85 260"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M350 210 L350 260"] },
+					{ color: "blue", dasharray: "", coords: ["M355 210 L355 260"] },
+					{ color: "green", dasharray: "", coords: ["M350 210 L350 260"] },
+					{ color: "blue", dasharray: "0", coords: ["M355 210 L355 260"] },
+			  
+					{ color: "green", dasharray: "7", coords: ["M445 210 L445 260"] },
+					{ color: "blue", dasharray: "", coords: ["M450 210 L450 260"] },
+					{ color: "green", dasharray: "", coords: ["M445 210 L445 260"] },
+					{ color: "blue", dasharray: "0", coords: ["M450 210 L450 260"] },
+
+					{ color: "green", dasharray: "7", coords: ["M460 210 L460 238 L720 238 L720 260"] },
+					{ color: "blue", dasharray: "", coords: ["M465 210 L465 234 L725 234 L725 260"] },
+					{ color: "green", dasharray: "", coords: ["M460 210 L460 238 L720 238 L720 260"] },
+					{ color: "blue", dasharray: "0", coords: ["M465 210 L465 234 L725 234 L725 260"] },
+				  ];
+				</script>
+			  
+				<!-- Создание линий с помощью цикла -->
+				<script>
+				  for (const lineData of linesData) {
+					const { color, dasharray, coords } = lineData;
+					
+			  
+					coords.forEach(d => {
+					  const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+					  pathElement.setAttribute("stroke", color);
+					  pathElement.setAttribute("stroke-width", "2");
+					  pathElement.setAttribute("d", d);
+					  pathElement.setAttribute("fill", "none");
+					  pathElement.setAttribute("stroke-dasharray", dasharray);
+					  
+					  // Определение атрибута visibility в зависимости от dasharray
+					if (dasharray === "") {
+						pathElement.setAttribute("visibility", "hidden");
+					} else {
+						pathElement.setAttribute("visibility", "visible");
+					}
+			  
+					  document.getElementById("lines").appendChild(pathElement);
+					});
+				  }
+				</script>
+			  </g>
+
+
+
+			<g transform="translate(500, 360)">
+				<polyline points="0,0 20,0" style="stroke: green; stroke-width: 2;"></polyline>
+				<text x="23" y="5" font-size="12px">Выдача команд ОК</text>
+			</g>
+			<g transform="translate(500, 380)">
+				<polyline points="0,0 20,0" style="stroke: blue; stroke-width: 2;"></polyline>
+				<text x="23" y="5" font-size="12px">Прием данных ОК</text>
+			</g>
+
+			<g transform="translate(655, 360)">
+				<polyline points="0,0 20,0" style="stroke: green; stroke-width: 2;" stroke-dasharray="4"></polyline>
+				<text x="23" y="5" font-size="12px">Выдача команд РК</text>
+			</g>
+			<g transform="translate(655, 380)">
+				<polyline points="0,0 20,0" style="stroke: blue; stroke-width: 2;" stroke-dasharray="4"></polyline>
+				<text x="23" y="5" font-size="12px">Прием данных РК</text>
+			</g>
+		</svg>
+	</div>
+	
+
+	</main>
+</body>
+</html>
