@@ -1,7 +1,0 @@
-D:\my projects\ion-nnk-state-machine\bin\TypeScriptHTMLApp1.dll
-D:\my projects\ion-nnk-state-machine\bin\TypeScriptHTMLApp1.pdb
-D:\my projects\ion-nnk-state-machine\obj\Debug\RLAB.NKPORI.WebApp.csproj.CoreCompileInputs.cache
-D:\my projects\ion-nnk-state-machine\obj\Debug\TypeScriptHTMLApp1.dll
-D:\my projects\ion-nnk-state-machine\obj\Debug\TypeScriptHTMLApp1.pdb
-D:\my projects\ion-nnk-state-machine\bin\TypeScriptHTMLApp1.dll.config
-D:\my projects\ion-nnk-state-machine\obj\Debug\RLAB.NKPORI.WebApp.csproj.AssemblyReference.cache
