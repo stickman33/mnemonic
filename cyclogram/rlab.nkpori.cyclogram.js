@@ -9,12 +9,24 @@ var rlab;
                 this.isTimeLineVisible = ko.observable(false);
                 this.isSVGvisible = ko.observable(false);
                 this.cycTablePage = 1;
+                this.coordinatesByGuid = {
+                    "8efe9b57-f117-ed11-8ed8-00155d09ea1d": ["330,130 330,108 80,108 80,80", "335,130 335,104 85,104 85,80"],
+                    "bb103bd9-f417-ed11-8ed8-00155d09ea1d": ["350,130 350,80", "355,130 355,80"],
+                    "d7bacbb4-a848-ed11-8edc-00155d09ea1d": ["445,130 445,80", "450,130 450,80"],
+                    "e7c4e462-3b67-ed11-8edf-00155d09ea1d": ["460,130 460,104 720,104 720,80", "465,130 465,108 725,108 725,80"],
+                    "5f1500d5-4a72-ed11-8edf-00155d09ea1d": ["323,168 155,168", "323,173 155,173"],
+                    "078471e5-4a72-ed11-8edf-00155d09ea1d": ["478,168 644,168", "478,173 644,173"],
+                    "10da8efb-4a72-ed11-8edf-00155d09ea1d": ["330,210 330,234 80,234 80,260", "335,210 335,238 85,238 85,260"],
+                    "ccde500c-4b72-ed11-8edf-00155d09ea1d": ["350,210 350,260", "355,210 355,260"],
+                    "1c0cbce0-1ebf-ed11-8eec-00155d09ea1d": ["445,210 445,260", "450,210 450,260"],
+                    "8252d6c9-74c2-ed11-8eed-00155d09ea1d": ["460,210 460,238 720,238 720,260", "465,210 465,234 725,234 725,260"]
+                };
                 this.subscriptions = [];
                 this.timers = [];
-                this.mnemoSquares = ko.observableArray([]);
+                this.mnemoRects = ko.observableArray([]);
+                this.dataBusLines = ko.observableArray([]);
                 this.states = [];
                 this.intervals = [];
-                //this.spaceCraft = ko.observable(SCs[0].key);
                 this.definitions = ko.observableArray([]);
                 this.instruments = ko.observableArray([]);
                 this.cyclograms = ko.observableArray([]);
@@ -40,11 +52,8 @@ var rlab;
                             isAxis: false,
                             fields: [],
                             isScale: false
-                            //IsVisible: false
                         },
                         {
-                            //min: -1,
-                            //max: 2,
                             height: 200,
                             isAxis: false,
                             fields: []
@@ -56,7 +65,6 @@ var rlab;
                 console.log("CyclogramModel: constructed");
                 this.GetInstruments();
                 this.GetCommandDefinition();
-                //this.GetCyclogram(this.cycTablePage);
                 this.timeLineOptions;
                 this.GetStates();
             }
@@ -76,458 +84,24 @@ var rlab;
                 self.CommandsGet(GUID);
                 self.timeLineOptions.selectedTime(new Date(0));
                 self.GetIntervals(GUID);
+                self.createRectsLines();
                 if (!self.timeLineOptions.isZoom()) {
                     self.timeLineOptions.isZoom(true);
                 }
                 if (!self.isSVGvisible()) {
                     self.isSVGvisible(true);
                 }
-                //this.resizeSVGSquare = this.resizeSVGSquare.bind(this);
-                this.resizeSVGSquare = this.resizeSVGSquare.bind(this);
-                window.addEventListener("resize", this.resizeSVGSquare);
-                window.addEventListener("resize", this.updateLegendWidth);
                 this.subscriptions.push(this.timeLineOptions.selectedTime.subscribe(function (newValue) {
-                    _this.updSVGSquareState();
+                    _this.updSVGRectState();
+                    _this.updBusLines();
                 }, this));
             };
-            CyclogramModel.prototype.updateLegendWidth = function () {
-                var legend = document.getElementById("legend");
-                if (legend) {
-                    var legendWidth = window.innerWidth * 0.1;
-                    legend.style.width = legendWidth + "px";
-                }
-            };
-            CyclogramModel.prototype.getRectPos = function (id) {
-                var SVGSquarePos;
-                var svg = document.getElementById(id);
-                var div = document.getElementById("figure").getBoundingClientRect();
-                var rect = svg.querySelector('g > rect');
-                var boundingClientRect = rect.getBoundingClientRect();
-                SVGSquarePos = {
-                    x: boundingClientRect.x - div.x,
-                    y: boundingClientRect.y - div.y,
-                    width: boundingClientRect.width,
-                    height: boundingClientRect.height
-                };
-                return SVGSquarePos;
-            };
-            CyclogramModel.prototype.countMiddleCoord = function (id, side) {
-                var self = this;
-                var coordinates = self.getRectPos(id);
-                if (side == "top") {
-                    var x = coordinates.x + (coordinates.width / 2);
-                    var y = coordinates.y;
-                    return [x, y];
-                }
-                else if (side == "lside") {
-                    var x = coordinates.x;
-                    var y = coordinates.y + (coordinates.height / 2);
-                    return [x, y];
-                }
-                else if (side == "rside") {
-                    var x = coordinates.x + coordinates.width;
-                    var y = coordinates.y + (coordinates.height / 2);
-                    return [x, y];
-                }
-                else if (side == "bot") {
-                    var x = coordinates.x + (coordinates.width / 2);
-                    var y = coordinates.y + coordinates.height;
-                    return [x, y];
-                }
-            };
-            CyclogramModel.prototype.drawBKUSNILines = function () {
-                var self = this;
-                //svgLines.remove();
-                var svgDiv = document.getElementById("figure");
-                var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                svg.setAttribute("width", "100%");
-                svg.setAttribute("height", "100%");
-                svg.setAttribute("id", "lines");
-                self.mnemoSquares().forEach(function (square) {
-                    //if (square.Title == "БКУСНИ") {
-                    //    line.setAttribute("x1", "0px");
-                    //    line.setAttribute("y1", "0px");
-                    //}
-                    //else if (square.Title == "ЛАЭРТ") {
-                    //    line.setAttribute("x2", "0px");
-                    //    line.setAttribute("y2", "0px");
-                    //    line.setAttribute("id", "KbvLine");
-                    //    //pollLine.setAttribute("id", "PollLine");
-                    //}
-                    var kbvLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    kbvLine.setAttribute("stroke", "green");
-                    kbvLine.setAttribute("stroke-width", "2");
-                    kbvLine.setAttribute("x1", "0px");
-                    kbvLine.setAttribute("y1", "0px");
-                    kbvLine.setAttribute("x2", "0px");
-                    kbvLine.setAttribute("y2", "0px");
-                    kbvLine.setAttribute("id", "KbvLine_" + square.index);
-                    var pollLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    pollLine.setAttribute("stroke", "blue");
-                    pollLine.setAttribute("stroke-width", "2");
-                    pollLine.setAttribute("x1", "0px");
-                    pollLine.setAttribute("y1", "0px");
-                    pollLine.setAttribute("x2", "0px");
-                    pollLine.setAttribute("y2", "0px");
-                    pollLine.setAttribute("id", "PollLine_" + square.index);
-                    svg.appendChild(kbvLine);
-                    svg.appendChild(pollLine);
-                });
-                //let lineHalfset = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                //lineHalfset.setAttribute("stroke", "black");
-                //lineHalfset.setAttribute("stroke-width", "2");
-                //lineHalfset.setAttribute("z-index", "100");
-                //lineHalfset.setAttribute("x1", "6px");
-                //lineHalfset.setAttribute("y1", "270px");
-                //lineHalfset.setAttribute("x2", "155px");
-                //lineHalfset.setAttribute("y2", "270px");
-                //svg.appendChild(lineHalfset);
-                //svg.appendChild(pollLine);
-                svgDiv.appendChild(svg);
-                //document.body.appendChild(svg);
-                self.updBKUSNIlines();
-            };
             CyclogramModel.prototype.updBKUSNIlines = function () {
-                var self = this;
-                self.mnemoSquares().forEach(function (square) {
-                    var kbvLine = document.getElementById("KbvLine_" + square.index);
-                    var pollLine = document.getElementById("PollLine_" + square.index);
-                    //const pollLine = document.getElementById("PollLine");
-                    if (square.Title != "БКУСНИ") {
-                        var kbvLineCoords = self.calcLineCoordinates(square.index, square.Title, "kbv");
-                        kbvLine.setAttribute("x1", kbvLineCoords.x1);
-                        kbvLine.setAttribute("y1", kbvLineCoords.y1);
-                        kbvLine.setAttribute("x2", kbvLineCoords.x2);
-                        kbvLine.setAttribute("y2", kbvLineCoords.y2);
-                        var pollLineCoords = self.calcLineCoordinates(square.index, square.Title, "poll");
-                        pollLine.setAttribute("x1", pollLineCoords.x1);
-                        pollLine.setAttribute("y1", pollLineCoords.y1);
-                        pollLine.setAttribute("x2", pollLineCoords.x2);
-                        pollLine.setAttribute("y2", pollLineCoords.y2);
-                    }
-                });
-            };
-            CyclogramModel.prototype.calcLineCoordinates = function (squareIndex, squareTitle, lineType) {
-                var self = this;
-                var offset = 0;
-                var lineOffset = 0;
-                var bkusniCoords = self.getRectPos("БКУСНИ");
-                //let bkusniTop = self.countMiddleCoord("БКУСНИ", "top");
-                var bkusniTop = self.countMiddleCoord("БКУСНИ", "top");
-                var bkusniBot = self.countMiddleCoord("БКУСНИ", "bot");
-                var bkusniLSide = self.countMiddleCoord("БКУСНИ", "lside");
-                var bkusniRSide = self.countMiddleCoord("БКУСНИ", "rside");
-                var squareBot = self.countMiddleCoord(squareTitle, "bot");
-                var squareTop = self.countMiddleCoord(squareTitle, "top");
-                var squareLSide = self.countMiddleCoord(squareTitle, "lside");
-                var squareRSide = self.countMiddleCoord(squareTitle, "rside");
-                var lineCoords = {
-                    x1: "",
-                    y1: "",
-                    x2: "",
-                    y2: ""
-                };
-                if (lineType == 'kbv') {
-                    switch (squareIndex) {
-                        case 0:
-                        case 7:
-                            lineOffset = 10;
-                            offset = bkusniCoords.width / 16;
-                            break;
-                        case 1:
-                        case 8:
-                            offset = bkusniCoords.width * 5 / 16;
-                            break;
-                        case 2:
-                        case 9:
-                            offset = bkusniCoords.width * 9 / 16;
-                            break;
-                        case 3:
-                        case 10:
-                            lineOffset = -40;
-                            offset = bkusniCoords.width * 13 / 16;
-                            break;
-                    }
-                }
-                else {
-                    switch (squareIndex) {
-                        case 0:
-                        case 7:
-                            lineOffset = 40;
-                            offset = bkusniCoords.width * 3 / 16;
-                            break;
-                        case 1:
-                        case 8:
-                            lineOffset = 10;
-                            offset = (bkusniCoords.width * 7 / 16) - lineOffset;
-                            break;
-                        case 2:
-                        case 9:
-                            lineOffset = 10;
-                            offset = (bkusniCoords.width * 11 / 16) - lineOffset;
-                            break;
-                        case 3:
-                        case 10:
-                            lineOffset = -10;
-                            offset = bkusniCoords.width * 15 / 16;
-                            break;
-                        case 4:
-                        case 6:
-                            lineOffset = 5;
-                            break;
-                    }
-                }
-                if (squareIndex != 4 && squareIndex != 5 && squareIndex != 6) {
-                    if (squareIndex < 4) {
-                        lineCoords = {
-                            x1: bkusniCoords.x + offset + "px",
-                            y1: bkusniTop[1] + "px",
-                            x2: squareBot[0] + lineOffset + "px",
-                            y2: squareBot[1] + "px"
-                        };
-                    }
-                    else {
-                        lineCoords = {
-                            x1: bkusniCoords.x + offset + "px",
-                            y1: bkusniBot[1] + "px",
-                            x2: squareTop[0] + lineOffset + "px",
-                            y2: squareTop[1] + "px"
-                        };
-                    }
-                }
-                else if (squareIndex === 4) {
-                    lineCoords = {
-                        x1: bkusniLSide[0] + "px",
-                        y1: bkusniLSide[1] + lineOffset + "px",
-                        x2: squareRSide[0] + "px",
-                        y2: squareRSide[1] + lineOffset + "px"
-                    };
-                }
-                else if (squareIndex === 6) {
-                    lineCoords = {
-                        x1: bkusniRSide[0] + "px",
-                        y1: bkusniRSide[1] + lineOffset + "px",
-                        x2: squareLSide[0] + "px",
-                        y2: squareLSide[1] + lineOffset + "px"
-                    };
-                }
-                return lineCoords;
-            };
-            CyclogramModel.prototype.calcSVGSquareWidth = function () {
-                var containerWidth = document.getElementById("SVG").offsetWidth;
-                var squareWidth = (containerWidth - 30) / 5;
-                if (squareWidth > 165) {
-                    return 165;
-                }
-                else if (squareWidth < 115) {
-                    return 115;
-                }
-                else {
-                    return (containerWidth - 30) / 5;
-                }
-            };
-            CyclogramModel.prototype.resizeSVGSquare = function () {
-                var self = this;
-                var squareWidth = self.calcSVGSquareWidth();
-                //console.log(squareWidth);
-                self.mnemoSquares().forEach(function (square) {
-                    square.height(squareWidth * 0.4375);
-                });
-                self.updBKUSNIlines();
-            };
-            CyclogramModel.prototype.buildSVGsquares = function () {
-                var self = this;
-                var elemFigure = document.getElementById("figure");
-                var fragment = document.createDocumentFragment();
-                var elemDiv = document.createElement("div");
-                elemDiv.setAttribute("id", "squares");
-                var svgns = "http://www.w3.org/2000/svg";
-                self.mnemoSquares().forEach(function (square) {
-                    var elemSVG = document.createElementNS(svgns, "svg");
-                    elemSVG.setAttribute("viewBox", "0 0 160 75");
-                    var svgBinding = "style: { 'position': 'absolute', 'top': top, 'left': left, 'width': width, 'height': height }";
-                    elemSVG.setAttribute("id", square.Title);
-                    elemSVG.setAttribute("data-bind", svgBinding);
-                    var svgBindingContext = {
-                        top: square.top,
-                        left: square.left,
-                        width: square.width,
-                        height: square.height
-                    };
-                    ko.applyBindings(svgBindingContext, elemSVG);
-                    var elemGroup = document.createElementNS(svgns, "g");
-                    var groupElements = [];
-                    var elemRect = document.createElementNS(svgns, "rect");
-                    var elemCircle = document.createElementNS(svgns, "circle");
-                    var elemTextTitle = document.createElementNS(svgns, "text");
-                    var elemForeignObject = document.createElementNS(svgns, "foreignObject");
-                    var elemTextInObject = document.createElement("text");
-                    elemRect.setAttribute("x", "0");
-                    elemRect.setAttribute("y", "0");
-                    elemRect.setAttribute("width", "155");
-                    elemRect.setAttribute("height", "70");
-                    elemRect.setAttribute("rx", "5");
-                    elemRect.setAttribute("ry", "5");
-                    var rectBinding = "attr: { 'fill': fill, 'stroke': stroke }";
-                    elemRect.setAttribute("data-bind", rectBinding);
-                    var rectBindingContext = {
-                        fill: square.fill,
-                        stroke: square.stroke
-                    };
-                    ko.applyBindings(rectBindingContext, elemRect);
-                    elemCircle.setAttribute("cx", "140");
-                    elemCircle.setAttribute("cy", "10");
-                    elemCircle.setAttribute("r", "5");
-                    elemCircle.setAttribute("stroke", "black");
-                    elemCircle.setAttribute("strokeWidth", "1");
-                    var circleBinding = "attr: { 'fill': fill }";
-                    elemCircle.setAttribute("data-bind", circleBinding);
-                    var circleBindingContext = {
-                        fill: square.Circle.css
-                    };
-                    ko.applyBindings(circleBindingContext, elemCircle);
-                    elemTextTitle.setAttribute("text-anchor", "middle");
-                    elemTextTitle.setAttribute("x", "75");
-                    elemTextTitle.setAttribute("y", "18");
-                    elemTextTitle.textContent = square.Title;
-                    elemForeignObject.setAttribute("x", "5");
-                    elemForeignObject.setAttribute("y", "25");
-                    elemForeignObject.setAttribute("width", "145");
-                    elemForeignObject.setAttribute("height", "50");
-                    elemForeignObject.setAttribute("style", "font-size: 14px; line-height: 20px;");
-                    var textInObjBinding = "text: text";
-                    elemTextInObject.setAttribute("data-bind", textInObjBinding);
-                    var bindingContext = {
-                        text: square.text
-                    };
-                    ko.applyBindings(bindingContext, elemTextInObject);
-                    elemForeignObject.appendChild(elemTextInObject);
-                    groupElements.push(elemRect, elemCircle, elemTextTitle, elemForeignObject);
-                    //if (square.Title === "ГАЛС") {
-                    //    let elemLine = document.createElementNS(svgns, "line");
-                    //    elemLine.setAttribute("x1", "0");
-                    //    elemLine.setAttribute("y1", `${square.height() / 2}`);
-                    //    elemLine.setAttribute("x2", `${square.width()}`);
-                    //    elemLine.setAttribute("y2", `${square.height() / 2}`);
-                    //    elemLine.setAttribute("stroke", "black");  
-                    //    elemLine.setAttribute("stroke-width", "1");
-                    //    groupElements.push(elemLine);
-                    //}
-                    for (var _i = 0, groupElements_1 = groupElements; _i < groupElements_1.length; _i++) {
-                        var element = groupElements_1[_i];
-                        elemGroup.appendChild(element);
-                    }
-                    elemSVG.appendChild(elemGroup);
-                    elemDiv.appendChild(elemSVG);
-                });
-                fragment.appendChild(elemDiv);
-                elemFigure.appendChild(fragment);
-            };
-            CyclogramModel.prototype.calcSVGSquares = function () {
-                var self = this;
-                var squares = [];
-                var squareWidth = self.calcSVGSquareWidth();
-                var top = 0;
-                var left = 0;
-                var countSquare = 0;
-                var countRow = 0;
-                var square;
-                var squareIndex = 0;
-                self.instruments().forEach(function (instr) {
-                    if (instr.Title.toString() == "БКУСНИ") {
-                        square = ({
-                            GUID: instr.GUID.toString(),
-                            Title: instr.Title.toString(),
-                            Circle: { css: ko.observable("#ebebeb") },
-                            fill: ko.observable("#ebebeb"),
-                            stroke: ko.observable("black"),
-                            text: ko.observable("Расчет недоступен"),
-                            top: 25 + 10 + "%",
-                            left: "37.5%",
-                            width: ko.observable(squareWidth),
-                            height: ko.observable(squareWidth * 0.4375),
-                            index: 5
-                        });
-                        return squares.push(square);
-                    }
-                    else {
-                        square = ({
-                            GUID: instr.GUID.toString(),
-                            Title: instr.Title.toString(),
-                            Circle: { css: ko.observable("#ebebeb") },
-                            fill: ko.observable("#ebebeb"),
-                            stroke: ko.observable("black"),
-                            text: ko.observable("Расчет недоступен"),
-                            top: top + "%",
-                            left: left + "%",
-                            width: ko.observable(squareWidth),
-                            height: ko.observable(squareWidth * 0.4375),
-                            index: squareIndex
-                        });
-                    }
-                    if (countSquare < 3) {
-                        if (countRow != 1) {
-                            countSquare++;
-                            left = left + 25;
-                            squareIndex++;
-                        }
-                        else {
-                            if (countSquare == 0) {
-                                square = ({
-                                    GUID: instr.GUID.toString(),
-                                    Title: instr.Title.toString(),
-                                    Circle: { css: ko.observable("#ebebeb") },
-                                    fill: ko.observable("#ebebeb"),
-                                    stroke: ko.observable("black"),
-                                    text: ko.observable("Расчет недоступен"),
-                                    top: 25 + 10 + "%",
-                                    left: "0%",
-                                    width: ko.observable(squareWidth),
-                                    height: ko.observable(squareWidth * 0.4375),
-                                    index: 4
-                                });
-                                countSquare++;
-                                squareIndex += 2;
-                            }
-                            else if (countSquare == 1) {
-                                square = ({
-                                    GUID: instr.GUID.toString(),
-                                    Title: instr.Title.toString(),
-                                    Circle: { css: ko.observable("#ebebeb") },
-                                    fill: ko.observable("#ebebeb"),
-                                    stroke: ko.observable("black"),
-                                    text: ko.observable("Расчет недоступен"),
-                                    top: 25 + 10 + "%",
-                                    left: "75%",
-                                    width: ko.observable(squareWidth),
-                                    height: ko.observable(squareWidth * 0.4375),
-                                    index: 6
-                                });
-                                countRow++;
-                                countSquare = 0;
-                                top = top + 25 + 10;
-                                left = 0;
-                                squareIndex += 2;
-                            }
-                        }
-                    }
-                    else {
-                        top = top + 25 + 10;
-                        left = 25;
-                        countSquare = 0;
-                        countRow++;
-                    }
-                    squares.push(square);
-                });
-                self.mnemoSquares(squares);
             };
             CyclogramModel.prototype.GetStates = function () {
                 var self = this;
                 rlab.services.Request({
                     url: "../services/StateMachine.svc/state",
-                    //request: {
-                    //    spacecraft: self.spaceCraft(),
-                    //},
                     type: "GET",
                     contentType: "application/json",
                     success: function (data) {
@@ -540,25 +114,166 @@ var rlab;
                             });
                         });
                         self.states = tmp_data;
-                        //console.log(self.definitions());
                         console.log("список состояний загружен");
                     }
                 });
             };
-            CyclogramModel.prototype.updSVGSquareState = function () {
+            CyclogramModel.prototype.createRectsLines = function () {
                 var self = this;
+                var rectangles = [];
+                var lines = [];
+                var x = 1;
+                var y = 0;
+                var countSquare = 0;
+                var countRow = 0;
+                var rect;
+                var busLine;
+                self.instruments().forEach(function (instr, index) {
+                    var instrGUID = instr.GUID.toString();
+                    var instrTitle = instr.Title.toString();
+                    //возможно стоит по-другому укорачивать название
+                    if (instrTitle == "ОЗОНОМЕТР") {
+                        instrTitle = "ОЗОН";
+                    }
+                    if (instr.Title.toString() == "БКУСНИ") {
+                        rect = ({
+                            GUID: instrGUID,
+                            title: instrTitle,
+                            position: "translate(323,130)",
+                            disabled: ko.observable(true),
+                            kbv: null,
+                            poll: null,
+                            status: ko.observable("Расчет недоступен"),
+                            statusLight: null
+                        });
+                        return rectangles.push(rect);
+                    }
+                    else {
+                        rect = ({
+                            GUID: instrGUID,
+                            title: instrTitle,
+                            position: "translate(" + x + "," + y + ")",
+                            disabled: ko.observable(true),
+                            kbv: ko.observable(false),
+                            poll: ko.observable(false),
+                            status: ko.observable("Расчет недоступен"),
+                            statusLight: ko.observableArray([])
+                        });
+                        //create bus lines
+                        busLine = ({
+                            GUID: instrGUID,
+                            title: instrTitle,
+                            cmdCoords: self.coordinatesByGuid[instrGUID][0],
+                            dataCoords: self.coordinatesByGuid[instrGUID][1],
+                            mainCmdVis: ko.observable(false),
+                            mainDataVis: ko.observable(false),
+                            reserveCmdVis: ko.observable(false),
+                            reserveDataVis: ko.observable(false)
+                        });
+                        lines.push(busLine);
+                    }
+                    if (countSquare < 3) {
+                        if (countRow != 1) {
+                            countSquare++;
+                            x = x + 214;
+                        }
+                        else {
+                            if (countSquare == 0) {
+                                rect = ({
+                                    GUID: instrGUID,
+                                    title: instrTitle,
+                                    position: "translate(1,130)",
+                                    disabled: ko.observable(true),
+                                    kbv: ko.observable(false),
+                                    poll: ko.observable(false),
+                                    status: ko.observable("Расчет недоступен"),
+                                    statusLight: ko.observableArray([])
+                                });
+                                countSquare++;
+                            }
+                            else if (countSquare == 1) {
+                                rect = ({
+                                    GUID: instrGUID,
+                                    title: instrTitle,
+                                    position: "translate(643,130)",
+                                    disabled: ko.observable(true),
+                                    kbv: ko.observable(false),
+                                    poll: ko.observable(false),
+                                    status: ko.observable("Расчет недоступен"),
+                                    statusLight: ko.observableArray([])
+                                });
+                                countRow++;
+                                countSquare = 0;
+                                x = 1;
+                                y += 130;
+                            }
+                        }
+                    }
+                    else {
+                        x = 1;
+                        y += 130;
+                        countSquare = 0;
+                        countRow++;
+                    }
+                    rectangles.push(rect);
+                });
+                self.mnemoRects(rectangles);
+                self.dataBusLines(lines);
+            };
+            CyclogramModel.prototype.createDataBusLines = function () {
+                var self = this;
+            };
+            //shortenTitle(title: string) {
+            //    let words = title.split(' ');
+            //    const shortenedWords = [];
+            //    for (const word of words) {
+            //        shortenedWords.push(word.substring(0, 4));
+            //    }
+            //    return shortenedWords.join(" ");
+            //}
+            CyclogramModel.prototype.getLastConsonantIndex = function (str) {
+                var vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я', 'a', 'e', 'i', 'o', 'u'];
+                var _loop_1 = function (i) {
+                    if (!vowels.some(function (vowel) { return str[i] === vowel; }) && /[a-zA-Zа-яА-Я]/.test(str[i])) {
+                        return { value: i };
+                    }
+                };
+                for (var i = 4; i >= 0; i--) {
+                    var state_1 = _loop_1(i);
+                    if (typeof state_1 === "object")
+                        return state_1.value;
+                }
+                return -1;
+            };
+            CyclogramModel.prototype.shortenTitle = function (title) {
+                var self = this;
+                var words = title.split(' ');
+                var shortenedWords = words.map(function (word) {
+                    if (word.length > 4) {
+                        var lastVowelIndex = self.getLastConsonantIndex(word);
+                        if (lastVowelIndex !== -1) {
+                            return word.substring(0, lastVowelIndex + 1);
+                        }
+                        else {
+                            return word.substring(0, 4);
+                        }
+                    }
+                    return word;
+                });
+                return shortenedWords.join(' ');
+            };
+            CyclogramModel.prototype.updSVGRectState = function () {
+                var self = this;
+                var selectedTime = self.timeLineOptions.selectedTime() / 1000;
                 for (var key in self.intervals) {
                     var value = self.intervals[key];
-                    //var selectedTime = 254;
-                    var selectedTime = self.timeLineOptions.selectedTime() / 1000;
-                    //console.log("Instrument GUID: " + key);
                     value.forEach(function (val) {
                         if (value.length == 1) {
-                            self.mnemoSquares().forEach(function (square) {
-                                if (key == square.GUID) {
-                                    square.text("Расчет недоступен");
-                                    square.fill("#ebebeb");
-                                    square.Circle.css("#ebebeb");
+                            self.mnemoRects().forEach(function (rect) {
+                                if (key == rect.GUID) {
+                                    //rect.text("Расчет недоступен");
+                                    //rect.fill("#ebebeb");
+                                    //rect.Circle.css("#ebebeb");
                                 }
                             });
                         }
@@ -566,21 +281,28 @@ var rlab;
                             if (selectedTime > val.startOffset && selectedTime < val.stopOffset) {
                                 self.states.forEach(function (state) {
                                     if (val.GUIDState == state.GUID) {
-                                        //console.log("State: " + state.Title);
-                                        self.mnemoSquares().forEach(function (square) {
-                                            if (square.GUID == state.GUIDInstrument) {
-                                                square.text(state.Title);
+                                        self.mnemoRects().forEach(function (rect) {
+                                            var title = "";
+                                            if (rect.GUID == state.GUIDInstrument) {
+                                                //rect.text(state.Title);
+                                                title = state.Title;
+                                                if (state.Title.length > 20) {
+                                                    title = self.shortenTitle(state.Title);
+                                                }
+                                                rect.status(title);
+                                                rect.disabled(false);
                                                 if (state.Title == "Отключен") {
-                                                    square.fill("#ebebeb");
+                                                    //rect.fill("#ebebeb");
+                                                    rect.disabled(true);
                                                 }
                                                 else {
-                                                    square.fill("#a8c6f7");
+                                                    //rect.fill("#a8c6f7");
                                                 }
                                                 if (val.GUIDState == "2e85bad5-6a49-ed11-8edc-00155d09ea1d") {
-                                                    square.Circle.css("lightgreen");
+                                                    //rect.Circle.css("lightgreen");
                                                 }
                                                 else {
-                                                    square.Circle.css("#ebebeb");
+                                                    //rect.Circle.css("#ebebeb");
                                                 }
                                             }
                                         });
@@ -594,15 +316,45 @@ var rlab;
                     });
                 }
             };
+            CyclogramModel.prototype.updBusLines = function () {
+                var self = this;
+                var selectedTime = self.timeLineOptions.selectedTime() / 1000;
+                // Создаем объект для хранения информации о видимости команд
+                var commandVisibility = {};
+                // Проходим по командам и обновляем видимость в объекте
+                self.commands().forEach(function (cmd) {
+                    if (selectedTime > (cmd.Offset() / 1000)) {
+                        switch (cmd.GUIDSequenceItemDef) {
+                            case "e24320fd-c870-ed11-8edf-00155d09ea1d":
+                                commandVisibility["mainCmd"] = true;
+                                break;
+                            case "39925129-c970-ed11-8edf-00155d09ea1d":
+                                commandVisibility["reserveCmd"] = true;
+                                break;
+                            case "38ec6c56-c970-ed11-8edf-00155d09ea1d":
+                                commandVisibility["mainData"] = true;
+                                break;
+                            case "2ea7ad67-c970-ed11-8edf-00155d09ea1d":
+                                commandVisibility["reserveData"] = true;
+                                break;
+                        }
+                    }
+                });
+                // Проходим по строкам и устанавливаем видимость на основе объекта commandVisibility
+                self.dataBusLines().forEach(function (line) {
+                    line.mainCmdVis(commandVisibility["mainCmd"] || false);
+                    line.reserveCmdVis(commandVisibility["reserveCmd"] || false);
+                    line.mainDataVis(commandVisibility["mainData"] || false);
+                    line.reserveDataVis(commandVisibility["reserveData"] || false);
+                });
+            };
             CyclogramModel.prototype.updTimeLine = function () {
                 var self = this;
                 var count = 1;
                 for (var key in self.intervals) {
                     var value = self.intervals[key];
-                    //value.forEach(val => {
                     self.timeLineOptions.panels[1].fields.forEach(function (instr) {
                         if (key == instr.guidInstr) {
-                            //instr.data = { begin: new Date(), end: new Date(), value: count + 1 };
                             if (value.length > 1) {
                                 var startOffset = value[0].startOffset;
                                 var stopOffset = value[value.length - 1].stopOffset;
@@ -614,41 +366,24 @@ var rlab;
                         }
                     });
                     count += 2;
-                    //});
                 }
                 self.dateLimitParams.valueHasMutated();
-                //self.dataArray.push({ begin: new Date(1), end: new Date(50000), value: 1 });
             };
             CyclogramModel.prototype.GetIntervals = function (guid) {
                 var self = this;
                 var svgLines = document.getElementById("lines");
-                var divSqaures = document.getElementById("squares");
+                var divSqaures = document.getElementById("rects");
                 rlab.services.Request({
                     url: "../services/StateMachine.svc/CalculationNI?sequence=" + guid,
-                    //request: {
-                    //    spacecraft: self.spaceCraft(),
-                    //},
                     type: "GET",
                     contentType: "application/json",
                     success: function (data) {
-                        //let tmp_dict: {};
                         var tmp_intervals = [];
                         data.forEach(function (instr) {
                             tmp_intervals = instr.Value;
                             self.intervals[instr.Key] = tmp_intervals;
                         });
-                        self.calcSVGSquares();
-                        if (divSqaures) {
-                            divSqaures.remove();
-                        }
-                        self.buildSVGsquares();
-                        if (svgLines) {
-                            self.updBKUSNIlines();
-                        }
-                        else {
-                            self.drawBKUSNILines();
-                        }
-                        self.updSVGSquareState();
+                        self.updSVGRectState();
                         self.updTimeLine();
                     },
                     error: function (data) {
@@ -660,9 +395,6 @@ var rlab;
                 var self = this;
                 rlab.services.Request({
                     url: "../services/Sequences.svc/sequenceitemdefinition",
-                    //request: {
-                    //    spacecraft: self.spaceCraft(),
-                    //},
                     type: "GET",
                     contentType: "application/json",
                     success: function (data) {
@@ -676,7 +408,6 @@ var rlab;
                             });
                         });
                         self.definitions(tmp_data);
-                        //console.log(self.definitions());
                         console.log("список определений команд загружен");
                     },
                     error: function (data) {
@@ -692,7 +423,6 @@ var rlab;
                     type: "GET",
                     contentType: "application/json",
                     success: function (data) {
-                        //let tmp_data: Instrument[] = [];
                         data.forEach(function (instr) {
                             var item = {
                                 GUID: instr.GUID,
@@ -701,21 +431,17 @@ var rlab;
                             };
                             self.timeLineOptions.panels[0].fields.push({ title: item.Title, field: item.SecurityGroup + "_value", style: "event", width: 2 });
                             self.timeLineOptions.panels[1].fields.push({ title: item.Title, field: "value", style: "segment", width: 10, data: ko.observableArray([]), guidInstr: item.GUID });
-                            //self.timeLineOptions.panels[1].fields.push({ title: item.Title, field: "value", style: "segment", width: 5 });
                             self.instruments.push(item);
                         });
                         self.dateLimitParams.valueHasMutated();
                         self.isTimeLineVisible(true);
                         console.log("список приборов загружен");
-                        //console.log(self.instruments());
                         self.instruments().forEach(function (instr) {
                             self.intervals[instr.GUID] = {};
                         });
-                        //self.drawSVGSquare();
                         console.log("приборы на мнемосхеме построены");
                     },
                     error: function (data) {
-                        //self.instruments([]);
                         self.timeLineOptions.panels[0].fields([]);
                         console.log("Ошибка загрузки ");
                     }
@@ -724,31 +450,24 @@ var rlab;
             CyclogramModel.prototype.CommandsGet = function (guid) {
                 var self = this;
                 rlab.services.Request({
-                    //url: "/services/Planning.svc/command",
                     url: "../services/Sequences.svc/sequenceitemNI?guidsequence=" + guid + "&rows=10000&page=1&sidx=Offset&sord=asc",
-                    //request: {
-                    //    spacecraft: self.spaceCraft(),
-                    //    guidCyclogram: guid
-                    //},
                     type: "GET",
                     contentType: "application/json",
-                    //success: function (data: any[]) {
                     success: function (data) {
                         var tmp_data = [];
                         data.forEach(function (com) {
-                            ///kostyl' !!!!!!
-                            //com.Instrument = Instr[0].key 
                             var item = {
                                 GUID: com.GUID,
                                 GUIDSequenceItemDef: com.GUIDSequenceItemDef,
                                 GUIDSequence: com.GUIDSequence,
+                                GUIDInstrument: "",
+                                bitParameters: com.bitParameters,
                                 Offset: ko.observable(com.Offset * 1000),
                                 begin: new Date(com.Offset * 1000)
                             };
-                            /*item[com.Instrument + "_value"] = com.Code*/ /*;*/
-                            //self.definitions().forEach(def => { if (def.GUID == com.GUIDSequenceItemDef) { console.log(def.GUIDInstrument) } });
                             self.definitions().forEach(function (def) {
                                 if (def.GUID == com.GUIDSequenceItemDef) {
+                                    item.GUIDInstrument = def.GUIDInstrument;
                                     self.instruments().forEach(function (instr) {
                                         if (def.GUIDInstrument == instr.GUID.toString()) {
                                             //console.log(instr.Title);
@@ -757,18 +476,14 @@ var rlab;
                                     });
                                 }
                             });
-                            //item["iosph0-instr-pes_value"] = com.GUID;
                             tmp_data.push(item);
                         });
                         self.timeLineOptions.isSelectTime(true);
                         self.dateLimitParams().begin(new Date(-1 * 1000 * 5));
                         self.dateLimitParams().end(new Date(tmp_data[tmp_data.length - 1].Offset() * 1.2));
                         self.commands(tmp_data);
-                        //self.timeLineOptions.panels[1].data.push({ "iosph0-instr-pes_value1": "Режим 1", "begin": new Date(0), "end": new Date(50000) });
                         self.dateLimitParams.valueHasMutated();
                         console.log("список команд загружен");
-                        //console.log(self.dateLimitParams().end());
-                        //console.log(self.commands());
                     },
                     error: function (data) {
                         self.cyclograms([]);
