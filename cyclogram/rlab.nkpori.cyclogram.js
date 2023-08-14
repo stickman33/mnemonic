@@ -141,10 +141,10 @@ var rlab;
                             title: instrTitle,
                             position: "translate(323,130)",
                             disabled: ko.observable(true),
-                            kbv: null,
-                            poll: null,
+                            kbv: ko.observable(),
+                            poll: ko.observable(),
                             status: ko.observable("Расчет недоступен"),
-                            statusLight: null
+                            statusLight: ko.observableArray([])
                         });
                         return rectangles.push(rect);
                     }
@@ -220,17 +220,6 @@ var rlab;
                 self.mnemoRects(rectangles);
                 self.dataBusLines(lines);
             };
-            CyclogramModel.prototype.createDataBusLines = function () {
-                var self = this;
-            };
-            //shortenTitle(title: string) {
-            //    let words = title.split(' ');
-            //    const shortenedWords = [];
-            //    for (const word of words) {
-            //        shortenedWords.push(word.substring(0, 4));
-            //    }
-            //    return shortenedWords.join(" ");
-            //}
             CyclogramModel.prototype.getLastConsonantIndex = function (str) {
                 var vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я', 'a', 'e', 'i', 'o', 'u'];
                 var _loop_1 = function (i) {
@@ -318,34 +307,52 @@ var rlab;
             };
             CyclogramModel.prototype.updBusLines = function () {
                 var self = this;
+                // Получаем выбранное время и переводим в секунды
                 var selectedTime = self.timeLineOptions.selectedTime() / 1000;
-                // Создаем объект для хранения информации о видимости команд
-                var commandVisibility = {};
-                // Проходим по командам и обновляем видимость в объекте
-                self.commands().forEach(function (cmd) {
-                    if (selectedTime > (cmd.Offset() / 1000)) {
-                        switch (cmd.GUIDSequenceItemDef) {
-                            case "e24320fd-c870-ed11-8edf-00155d09ea1d":
-                                commandVisibility["mainCmd"] = true;
-                                break;
-                            case "39925129-c970-ed11-8edf-00155d09ea1d":
-                                commandVisibility["reserveCmd"] = true;
-                                break;
-                            case "38ec6c56-c970-ed11-8edf-00155d09ea1d":
-                                commandVisibility["mainData"] = true;
-                                break;
-                            case "2ea7ad67-c970-ed11-8edf-00155d09ea1d":
-                                commandVisibility["reserveData"] = true;
-                                break;
-                        }
+                // Массив GUID, с которыми мы будем работать
+                var targetGuids = [
+                    "e24320fd-c870-ed11-8edf-00155d09ea1d",
+                    "39925129-c970-ed11-8edf-00155d09ea1d",
+                    "38ec6c56-c970-ed11-8edf-00155d09ea1d",
+                    "2ea7ad67-c970-ed11-8edf-00155d09ea1d"
+                ];
+                // Маппинг GUIDSequenceItemDef на соответствующее свойство видимости
+                var visibilityMapping = {
+                    "e24320fd-c870-ed11-8edf-00155d09ea1d": "mainCmdVis",
+                    "39925129-c970-ed11-8edf-00155d09ea1d": "reserveCmdVis",
+                    "38ec6c56-c970-ed11-8edf-00155d09ea1d": "mainDataVis",
+                    "2ea7ad67-c970-ed11-8edf-00155d09ea1d": "reserveDataVis",
+                };
+                // Функция для установки видимости в зависимости от параметров
+                var visibilitySetter = function (param, visibilityProperty, value) {
+                    // Изменяем видимость свойства для соответствующей строки данных
+                    var busLine = self.dataBusLines()[param.paramNumber];
+                    if (busLine && typeof busLine[visibilityProperty] === 'function') {
+                        console.log("Setting " + visibilityProperty + " of bus line " + param.paramNumber + " to " + value);
+                        busLine[visibilityProperty](value);
                     }
-                });
-                // Проходим по строкам и устанавливаем видимость на основе объекта commandVisibility
-                self.dataBusLines().forEach(function (line) {
-                    line.mainCmdVis(commandVisibility["mainCmd"] || false);
-                    line.reserveCmdVis(commandVisibility["reserveCmd"] || false);
-                    line.mainDataVis(commandVisibility["mainData"] || false);
-                    line.reserveDataVis(commandVisibility["reserveData"] || false);
+                    else {
+                        console.log("Invalid visibilityProperty or busLine for param " + param.paramNumber);
+                    }
+                };
+                // Обходим все команды
+                self.commands().forEach(function (cmd) {
+                    // Проверяем, превышает ли время Offset команды выбранное время
+                    var isTimeGreaterThanOffset = selectedTime > (cmd.Offset() / 1000);
+                    // Проверяем, есть ли GUID команды в массиве targetGuids
+                    if (targetGuids.indexOf(cmd.GUIDSequenceItemDef) !== -1) {
+                        // Получаем соответствующее свойство видимости из маппинга
+                        var visibilityProperty_1 = visibilityMapping[cmd.GUIDSequenceItemDef];
+                        // Обходим параметры команды
+                        cmd.bitParameters.forEach(function (param) {
+                            // Определяем значение видимости в зависимости от времени
+                            var value = isTimeGreaterThanOffset ? Boolean(param.value) : false;
+                            // Выводим отладочное сообщение
+                            console.log("Processing param " + param.paramNumber + ", visibilityProperty: " + visibilityProperty_1 + ", value: " + value);
+                            // Устанавливаем видимость с помощью функции visibilitySetter
+                            visibilitySetter(param, visibilityProperty_1, value);
+                        });
+                    }
                 });
             };
             CyclogramModel.prototype.updTimeLine = function () {

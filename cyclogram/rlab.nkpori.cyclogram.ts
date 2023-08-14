@@ -23,7 +23,7 @@ namespace rlab.nkpori {
     }
 
     interface parameter {
-        paramnumber: number,
+        paramNumber: number,
         value: boolean
     }
 
@@ -239,10 +239,10 @@ namespace rlab.nkpori {
                         title: instrTitle,
                         position: "translate(323,130)",
                         disabled: ko.observable(true),
-                        kbv: null,
-                        poll: null,
+                        kbv: ko.observable(),
+                        poll: ko.observable(),
                         status: ko.observable("Расчет недоступен"),
-                        statusLight: null
+                        statusLight: ko.observableArray([])
                     });
 
                     return rectangles.push(rect);
@@ -331,22 +331,6 @@ namespace rlab.nkpori {
             self.dataBusLines(lines);
         }
 
-        createDataBusLines() {
-            let self = this;
-
-
-        }
-
-
-        //shortenTitle(title: string) {
-        //    let words = title.split(' ');
-        //    const shortenedWords = [];
-
-        //    for (const word of words) {
-        //        shortenedWords.push(word.substring(0, 4));
-        //    }
-        //    return shortenedWords.join(" ");
-        //}
 
         getLastConsonantIndex(str: string): number {
             const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я', 'a', 'e', 'i', 'o', 'u'];
@@ -438,39 +422,64 @@ namespace rlab.nkpori {
 
         updBusLines() {
             let self = this;
-            var selectedTime = self.timeLineOptions.selectedTime() / 1000;
 
-            // Создаем объект для хранения информации о видимости команд
-            var commandVisibility = {};
+            // Получаем выбранное время и переводим в секунды
+            const selectedTime = self.timeLineOptions.selectedTime() / 1000;
 
-            // Проходим по командам и обновляем видимость в объекте
+            // Массив GUID, с которыми мы будем работать
+            const targetGuids = [
+                "e24320fd-c870-ed11-8edf-00155d09ea1d",
+                "39925129-c970-ed11-8edf-00155d09ea1d",
+                "38ec6c56-c970-ed11-8edf-00155d09ea1d",
+                "2ea7ad67-c970-ed11-8edf-00155d09ea1d"
+            ];
+
+            // Маппинг GUIDSequenceItemDef на соответствующее свойство видимости
+            const visibilityMapping = {
+                "e24320fd-c870-ed11-8edf-00155d09ea1d": "mainCmdVis",
+                "39925129-c970-ed11-8edf-00155d09ea1d": "reserveCmdVis",
+                "38ec6c56-c970-ed11-8edf-00155d09ea1d": "mainDataVis",
+                "2ea7ad67-c970-ed11-8edf-00155d09ea1d": "reserveDataVis",
+            };
+
+            // Функция для установки видимости в зависимости от параметров
+            const visibilitySetter = (param, visibilityProperty, value) => {
+                // Изменяем видимость свойства для соответствующей строки данных
+                const busLine = self.dataBusLines()[param.paramNumber];
+                if (busLine && typeof busLine[visibilityProperty] === 'function') {
+                    console.log(`Setting ${visibilityProperty} of bus line ${param.paramNumber} to ${value}`);
+                    busLine[visibilityProperty](value);
+                } else {
+                    console.log(`Invalid visibilityProperty or busLine for param ${param.paramNumber}`);
+                }
+            };
+
+            // Обходим все команды
             self.commands().forEach(cmd => {
-                if (selectedTime > (cmd.Offset() / 1000)) {
-                    switch (cmd.GUIDSequenceItemDef) {
-                        case "e24320fd-c870-ed11-8edf-00155d09ea1d":
-                            commandVisibility["mainCmd"] = true;
-                            break;
-                        case "39925129-c970-ed11-8edf-00155d09ea1d":
-                            commandVisibility["reserveCmd"] = true;
-                            break;
-                        case "38ec6c56-c970-ed11-8edf-00155d09ea1d":
-                            commandVisibility["mainData"] = true;
-                            break;
-                        case "2ea7ad67-c970-ed11-8edf-00155d09ea1d":
-                            commandVisibility["reserveData"] = true;
-                            break;
-                    }
+                // Проверяем, превышает ли время Offset команды выбранное время
+                const isTimeGreaterThanOffset = selectedTime > (cmd.Offset() / 1000);
+
+                // Проверяем, есть ли GUID команды в массиве targetGuids
+                if (targetGuids.indexOf(cmd.GUIDSequenceItemDef) !== -1) {
+                    // Получаем соответствующее свойство видимости из маппинга
+                    const visibilityProperty = visibilityMapping[cmd.GUIDSequenceItemDef];
+                    // Обходим параметры команды
+                    cmd.bitParameters.forEach(param => {
+                        // Определяем значение видимости в зависимости от времени
+                        const value = isTimeGreaterThanOffset ? Boolean(param.value) : false;
+                        // Выводим отладочное сообщение
+                        console.log(`Processing param ${param.paramNumber}, visibilityProperty: ${visibilityProperty}, value: ${value}`);
+                        // Устанавливаем видимость с помощью функции visibilitySetter
+                        visibilitySetter(param, visibilityProperty, value);
+                    });
                 }
             });
-
-            // Проходим по строкам и устанавливаем видимость на основе объекта commandVisibility
-            self.dataBusLines().forEach(line => {
-                line.mainCmdVis(commandVisibility["mainCmd"] || false);
-                line.reserveCmdVis(commandVisibility["reserveCmd"] || false);
-                line.mainDataVis(commandVisibility["mainData"] || false);
-                line.reserveDataVis(commandVisibility["reserveData"] || false);
-            });
         }
+
+
+
+
+
 
 
         updTimeLine() {

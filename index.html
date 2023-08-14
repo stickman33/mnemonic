@@ -98,11 +98,11 @@
                             <line x1="0" y1="60" x2="155" y2="60" stroke-width="1" />
                             <!--bkusni lights-->
                             <g transform="translate(0, 26)">
-                                <g data-bind="if: kbv != null, attr: { class: kbv == true ? 'light-on' : 'light-off' } " transform="translate(0, 0.5)">
+                                <g data-bind="if: kbv() != undefined, attr: { class: kbv() ? 'light-on' : 'light-off' } " transform="translate(0, 0.5)">
                                     <circle cx="9" cy="5" r="5"></circle>
                                     <text text-anchor="start" x="19" y="9.4" font-size="12">КБВ</text>
                                 </g>
-                                <g data-bind="if: poll != null, attr: { class: poll == true ? 'light-on' : 'light-off' }, " transform="translate(0, 20.6)">
+                                <g data-bind="if: poll() != undefined, attr: { class: poll() ? 'light-on' : 'light-off' }, " transform="translate(0, 20.6)">
                                     <circle cx="9" cy="5" r="5"></circle>
                                     <text text-anchor="start" x="19" y="9.4" font-size="12">Опрос</text>
                                 </g>
