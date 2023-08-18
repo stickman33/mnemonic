@@ -83,6 +83,9 @@ namespace rlab.nkpori {
             "8252d6c9-74c2-ed11-8eed-00155d09ea1d": ["460,210 460,238 720,238 720,260", "465,210 465,234 725,234 725,260"]
         };
 
+        kbvPollIntervals = [];
+
+
 
 
 
@@ -100,7 +103,8 @@ namespace rlab.nkpori {
             this.selectedCyclogramGUID = ko.observable(null);
             this.commands = ko.observableArray([]);
 
-            
+
+
 
 
             this.dateLimitParams = ko.observable({
@@ -175,15 +179,12 @@ namespace rlab.nkpori {
             if (!self.isSVGvisible()) {
                 self.isSVGvisible(true);
             }
-            
+
             this.subscriptions.push(this.timeLineOptions.selectedTime.subscribe(newValue => {
                 this.updSVGRectState();
                 this.updBusLines();
+                this.updBkusniLights();
             }, this));
-        }
-
-        updBKUSNIlines() {
-
         }
 
         GetStates() {
@@ -411,7 +412,7 @@ namespace rlab.nkpori {
                                     });
                                 }
                                 else if (val.GUIDState == "00000000-0000-0000-0000-000000000000") {
-                                    self.updBKUSNIlines();
+
                                 }
                             });
                         }
@@ -419,6 +420,113 @@ namespace rlab.nkpori {
                 });
             }
         }
+
+        updBkusniLights() {
+            // Сохраняем ссылку на текущий контекст
+            const self = this;
+
+            // Получаем выбранное время и переводим в секунды
+            const selectedTime = self.timeLineOptions.selectedTime() / 1000;
+
+            // Массив GUID, с которыми мы будем работать
+            const targetGuids = [
+                "356768d1-ba5a-ed11-8edc-00155d09ea1d",
+                "346768d1-ba5a-ed11-8edc-00155d09ea1d",
+                "f235ecf3-a861-ed11-8edd-00155d09ea1d",
+                "db5debd7-645b-ed11-8edc-00155d09ea1d"
+            ];
+
+            // Маппинг GUIDSequenceItemDef на соответствующее свойство видимости
+            const visibilityMapping = {
+                "356768d1-ba5a-ed11-8edc-00155d09ea1d": "poll",
+                "346768d1-ba5a-ed11-8edc-00155d09ea1d": "poll",
+                "f235ecf3-a861-ed11-8edd-00155d09ea1d": "kbv",
+                "db5debd7-645b-ed11-8edc-00155d09ea1d": "kbv"
+            };
+
+            // Функция для установки видимости и состояния
+            const visibilitySetter = (rect, visibilityProperty, value) => {
+                if (rect[visibilityProperty] !== undefined) {
+                    // Устанавливаем видимость
+                    rect[visibilityProperty](value);
+
+                    // Если есть состояние "disabled", обновляем его
+                    if (rect.disabled) {
+                        rect.disabled(false);
+                    }
+                }
+            };
+
+            // Проход по всем интервалам БКУСНИ и командам циклограммы
+            self.kbvPollIntervals.forEach(interval => {
+                self.commands().forEach(cmd => {
+                    let cmdOffset = cmd.Offset() / 1000;
+
+                    
+                    if (selectedTime > cmdOffset &&  cmdOffset === interval.startOffset ) {
+                        // Получаем соответствующее свойство видимости из маппинга
+                        const visibilityProperty = visibilityMapping[cmd.GUIDSequenceItemDef];
+                        console.log(`selectedTime ${selectedTime}, cmdOffset ${cmdOffset},  val.startOffset ${interval.startOffset}, val.stopOffset ${interval.stopOffset},`);
+                        console.log(`Found suitable command with GUID ${cmd.GUID}`);
+
+                        // Проходимся по параметрам команды
+                        cmd.bitParameters.forEach(param => {
+                            const rect = param.paramNumber > 2 ? self.mnemoRects()[param.paramNumber + 1] : self.mnemoRects()[param.paramNumber];
+                            const value = param.value;
+
+                            // Проверяем значение параметра и применяем видимость в зависимости от GUID команды
+                            if (param.value) {
+                                if (cmd.GUIDSequenceItemDef === "356768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "f235ecf3-a861-ed11-8edd-00155d09ea1d") {
+                                    if (value) {
+                                        visibilitySetter(rect, visibilityProperty, true);
+                                        console.log(`засетил ${rect.title}`);
+                                    }
+                                } else if (cmd.GUIDSequenceItemDef === "346768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "db5debd7-645b-ed11-8edc-00155d09ea1d") {
+                                    if (value) {
+                                        visibilitySetter(rect, visibilityProperty, false);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                });
+            });
+
+            //Если выбранное время меньше первой команды опроса/КБВ либо больше последней, отключить
+            if (selectedTime < self.kbvPollIntervals[0].startOffset || selectedTime > self.kbvPollIntervals[self.kbvPollIntervals.length - 1].stopOffset) {
+                self.mnemoRects().forEach(rect => {
+                    rect.kbv(false);
+                    rect.poll(false);
+                });
+            }
+        }
+
+        getLightIntervals() {
+            // Сохраняем ссылку на текущий контекст
+            const self = this;
+            self.kbvPollIntervals = [];
+
+            // Массив GUID, с которыми мы будем работать
+            const targetGuids = [
+                "356768d1-ba5a-ed11-8edc-00155d09ea1d",
+                "346768d1-ba5a-ed11-8edc-00155d09ea1d",
+                "f235ecf3-a861-ed11-8edd-00155d09ea1d",
+                "db5debd7-645b-ed11-8edc-00155d09ea1d"
+            ];
+
+            //Получаем интервалы БКУСНИ
+            self.intervals["5ebdec99-ba5a-ed11-8edc-00155d09ea1d"].forEach(interval => {
+                self.commands().forEach(cmd => {
+                    let cmdOffset = cmd.Offset() / 1000;
+
+                    if ((targetGuids.indexOf(cmd.GUIDSequenceItemDef) !== -1) && cmdOffset === interval.startOffset && cmdOffset < interval.stopOffset) {
+                        self.kbvPollIntervals.push(interval);
+                    }
+                });
+            });
+        }
+
 
         updBusLines() {
             let self = this;
@@ -447,10 +555,7 @@ namespace rlab.nkpori {
                 // Изменяем видимость свойства для соответствующей строки данных
                 const busLine = self.dataBusLines()[param.paramNumber];
                 if (busLine && typeof busLine[visibilityProperty] === 'function') {
-                    console.log(`Setting ${visibilityProperty} of bus line ${param.paramNumber} to ${value}`);
                     busLine[visibilityProperty](value);
-                } else {
-                    console.log(`Invalid visibilityProperty or busLine for param ${param.paramNumber}`);
                 }
             };
 
@@ -467,20 +572,12 @@ namespace rlab.nkpori {
                     cmd.bitParameters.forEach(param => {
                         // Определяем значение видимости в зависимости от времени
                         const value = isTimeGreaterThanOffset ? Boolean(param.value) : false;
-                        // Выводим отладочное сообщение
-                        console.log(`Processing param ${param.paramNumber}, visibilityProperty: ${visibilityProperty}, value: ${value}`);
                         // Устанавливаем видимость с помощью функции visibilitySetter
                         visibilitySetter(param, visibilityProperty, value);
                     });
                 }
             });
         }
-
-
-
-
-
-
 
         updTimeLine() {
             let self = this;
@@ -509,9 +606,7 @@ namespace rlab.nkpori {
 
         GetIntervals(guid: string) {
             let self = this;
-            var svgLines = document.getElementById("lines");
-            var divSqaures = document.getElementById("rects");
-
+            
 
             rlab.services.Request({
                 url: `../services/StateMachine.svc/CalculationNI?sequence=${guid}`,
@@ -526,6 +621,7 @@ namespace rlab.nkpori {
 
                     self.updSVGRectState();
                     self.updTimeLine();
+                    self.getLightIntervals();
 
                     
                 },

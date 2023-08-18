@@ -21,6 +21,7 @@ var rlab;
                     "1c0cbce0-1ebf-ed11-8eec-00155d09ea1d": ["445,210 445,260", "450,210 450,260"],
                     "8252d6c9-74c2-ed11-8eed-00155d09ea1d": ["460,210 460,238 720,238 720,260", "465,210 465,234 725,234 725,260"]
                 };
+                this.kbvPollIntervals = [];
                 this.subscriptions = [];
                 this.timers = [];
                 this.mnemoRects = ko.observableArray([]);
@@ -94,9 +95,8 @@ var rlab;
                 this.subscriptions.push(this.timeLineOptions.selectedTime.subscribe(function (newValue) {
                     _this.updSVGRectState();
                     _this.updBusLines();
+                    _this.updBkusniLights();
                 }, this));
-            };
-            CyclogramModel.prototype.updBKUSNIlines = function () {
             };
             CyclogramModel.prototype.GetStates = function () {
                 var self = this;
@@ -297,13 +297,102 @@ var rlab;
                                         });
                                     }
                                     else if (val.GUIDState == "00000000-0000-0000-0000-000000000000") {
-                                        self.updBKUSNIlines();
                                     }
                                 });
                             }
                         }
                     });
                 }
+            };
+            CyclogramModel.prototype.updBkusniLights = function () {
+                // Сохраняем ссылку на текущий контекст
+                var self = this;
+                // Получаем выбранное время и переводим в секунды
+                var selectedTime = self.timeLineOptions.selectedTime() / 1000;
+                // Массив GUID, с которыми мы будем работать
+                var targetGuids = [
+                    "356768d1-ba5a-ed11-8edc-00155d09ea1d",
+                    "346768d1-ba5a-ed11-8edc-00155d09ea1d",
+                    "f235ecf3-a861-ed11-8edd-00155d09ea1d",
+                    "db5debd7-645b-ed11-8edc-00155d09ea1d"
+                ];
+                // Маппинг GUIDSequenceItemDef на соответствующее свойство видимости
+                var visibilityMapping = {
+                    "356768d1-ba5a-ed11-8edc-00155d09ea1d": "poll",
+                    "346768d1-ba5a-ed11-8edc-00155d09ea1d": "poll",
+                    "f235ecf3-a861-ed11-8edd-00155d09ea1d": "kbv",
+                    "db5debd7-645b-ed11-8edc-00155d09ea1d": "kbv"
+                };
+                // Функция для установки видимости и состояния
+                var visibilitySetter = function (rect, visibilityProperty, value) {
+                    if (rect[visibilityProperty] !== undefined) {
+                        // Устанавливаем видимость
+                        rect[visibilityProperty](value);
+                        // Если есть состояние "disabled", обновляем его
+                        if (rect.disabled) {
+                            rect.disabled(false);
+                        }
+                    }
+                };
+                // Проход по всем интервалам БКУСНИ и командам циклограммы
+                self.kbvPollIntervals.forEach(function (interval) {
+                    self.commands().forEach(function (cmd) {
+                        var cmdOffset = cmd.Offset() / 1000;
+                        if (selectedTime > cmdOffset && cmdOffset === interval.startOffset) {
+                            // Получаем соответствующее свойство видимости из маппинга
+                            var visibilityProperty_1 = visibilityMapping[cmd.GUIDSequenceItemDef];
+                            console.log("selectedTime " + selectedTime + ", cmdOffset " + cmdOffset + ",  val.startOffset " + interval.startOffset + ", val.stopOffset " + interval.stopOffset + ",");
+                            console.log("Found suitable command with GUID " + cmd.GUID);
+                            // Проходимся по параметрам команды
+                            cmd.bitParameters.forEach(function (param) {
+                                var rect = param.paramNumber > 2 ? self.mnemoRects()[param.paramNumber + 1] : self.mnemoRects()[param.paramNumber];
+                                var value = param.value;
+                                // Проверяем значение параметра и применяем видимость в зависимости от GUID команды
+                                if (param.value) {
+                                    if (cmd.GUIDSequenceItemDef === "356768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "f235ecf3-a861-ed11-8edd-00155d09ea1d") {
+                                        if (value) {
+                                            visibilitySetter(rect, visibilityProperty_1, true);
+                                            console.log("\u0437\u0430\u0441\u0435\u0442\u0438\u043B " + rect.title);
+                                        }
+                                    }
+                                    else if (cmd.GUIDSequenceItemDef === "346768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "db5debd7-645b-ed11-8edc-00155d09ea1d") {
+                                        if (value) {
+                                            visibilitySetter(rect, visibilityProperty_1, false);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                });
+                //Если выбранное время меньше первой команды опроса/КБВ либо больше последней, отключить
+                if (selectedTime < self.kbvPollIntervals[0].startOffset || selectedTime > self.kbvPollIntervals[self.kbvPollIntervals.length - 1].stopOffset) {
+                    self.mnemoRects().forEach(function (rect) {
+                        rect.kbv(false);
+                        rect.poll(false);
+                    });
+                }
+            };
+            CyclogramModel.prototype.getLightIntervals = function () {
+                // Сохраняем ссылку на текущий контекст
+                var self = this;
+                self.kbvPollIntervals = [];
+                // Массив GUID, с которыми мы будем работать
+                var targetGuids = [
+                    "356768d1-ba5a-ed11-8edc-00155d09ea1d",
+                    "346768d1-ba5a-ed11-8edc-00155d09ea1d",
+                    "f235ecf3-a861-ed11-8edd-00155d09ea1d",
+                    "db5debd7-645b-ed11-8edc-00155d09ea1d"
+                ];
+                //Получаем интервалы БКУСНИ
+                self.intervals["5ebdec99-ba5a-ed11-8edc-00155d09ea1d"].forEach(function (interval) {
+                    self.commands().forEach(function (cmd) {
+                        var cmdOffset = cmd.Offset() / 1000;
+                        if ((targetGuids.indexOf(cmd.GUIDSequenceItemDef) !== -1) && cmdOffset === interval.startOffset && cmdOffset < interval.stopOffset) {
+                            self.kbvPollIntervals.push(interval);
+                        }
+                    });
+                });
             };
             CyclogramModel.prototype.updBusLines = function () {
                 var self = this;
@@ -328,11 +417,7 @@ var rlab;
                     // Изменяем видимость свойства для соответствующей строки данных
                     var busLine = self.dataBusLines()[param.paramNumber];
                     if (busLine && typeof busLine[visibilityProperty] === 'function') {
-                        console.log("Setting " + visibilityProperty + " of bus line " + param.paramNumber + " to " + value);
                         busLine[visibilityProperty](value);
-                    }
-                    else {
-                        console.log("Invalid visibilityProperty or busLine for param " + param.paramNumber);
                     }
                 };
                 // Обходим все команды
@@ -342,15 +427,13 @@ var rlab;
                     // Проверяем, есть ли GUID команды в массиве targetGuids
                     if (targetGuids.indexOf(cmd.GUIDSequenceItemDef) !== -1) {
                         // Получаем соответствующее свойство видимости из маппинга
-                        var visibilityProperty_1 = visibilityMapping[cmd.GUIDSequenceItemDef];
+                        var visibilityProperty_2 = visibilityMapping[cmd.GUIDSequenceItemDef];
                         // Обходим параметры команды
                         cmd.bitParameters.forEach(function (param) {
                             // Определяем значение видимости в зависимости от времени
                             var value = isTimeGreaterThanOffset ? Boolean(param.value) : false;
-                            // Выводим отладочное сообщение
-                            console.log("Processing param " + param.paramNumber + ", visibilityProperty: " + visibilityProperty_1 + ", value: " + value);
                             // Устанавливаем видимость с помощью функции visibilitySetter
-                            visibilitySetter(param, visibilityProperty_1, value);
+                            visibilitySetter(param, visibilityProperty_2, value);
                         });
                     }
                 });
@@ -378,8 +461,6 @@ var rlab;
             };
             CyclogramModel.prototype.GetIntervals = function (guid) {
                 var self = this;
-                var svgLines = document.getElementById("lines");
-                var divSqaures = document.getElementById("rects");
                 rlab.services.Request({
                     url: "../services/StateMachine.svc/CalculationNI?sequence=" + guid,
                     type: "GET",
@@ -392,6 +473,7 @@ var rlab;
                         });
                         self.updSVGRectState();
                         self.updTimeLine();
+                        self.getLightIntervals();
                     },
                     error: function (data) {
                         console.log("Ошибка");
