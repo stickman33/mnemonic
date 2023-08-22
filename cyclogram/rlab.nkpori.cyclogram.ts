@@ -1,5 +1,4 @@
 ﻿///<reference path="../lib/typing/knockout.d.ts" />
-///<reference path="../lib/rlab.nkpori.config.ts" />
 
 
 namespace rlab.nkpori {
@@ -71,15 +70,25 @@ namespace rlab.nkpori {
         intervals: Array<any>;
 
         coordinatesByGuid = {
+            //ПЭС
             "8efe9b57-f117-ed11-8ed8-00155d09ea1d": ["330,130 330,108 80,108 80,80", "335,130 335,104 85,104 85,80"],
+            //ЛАЭРТ
             "bb103bd9-f417-ed11-8ed8-00155d09ea1d": ["350,130 350,80", "355,130 355,80"],
+            //МАЯК
             "d7bacbb4-a848-ed11-8edc-00155d09ea1d": ["445,130 445,80", "450,130 450,80"],
+            //НВК2
             "e7c4e462-3b67-ed11-8edf-00155d09ea1d": ["460,130 460,104 720,104 720,80", "465,130 465,108 725,108 725,80"],
-            "5f1500d5-4a72-ed11-8edf-00155d09ea1d": ["323,168 155,168", "323,173 155,173"],
-            "078471e5-4a72-ed11-8edf-00155d09ea1d": ["478,168 644,168", "478,173 644,173"],
+            //ОЗОНОМЕТР
+            "5f1500d5-4a72-ed11-8edf-00155d09ea1d": ["323,168 156,168", "323,173 156,173"],
+            //СГ/ 1
+            "078471e5-4a72-ed11-8edf-00155d09ea1d": ["478,168 643,168", "478,173 643,173"],
+            //ГАЛС
             "10da8efb-4a72-ed11-8edf-00155d09ea1d": ["330,210 330,234 80,234 80,260", "335,210 335,238 85,238 85,260"],
+            //СПЭР
             "ccde500c-4b72-ed11-8edf-00155d09ea1d": ["350,210 350,260", "355,210 355,260"],
+            //ЭСИП ПК1
             "1c0cbce0-1ebf-ed11-8eec-00155d09ea1d": ["445,210 445,260", "450,210 450,260"],
+            //ЭСИП ПК2
             "8252d6c9-74c2-ed11-8eed-00155d09ea1d": ["460,210 460,238 720,238 720,260", "465,210 465,234 725,234 725,260"]
         };
 
@@ -169,7 +178,7 @@ namespace rlab.nkpori {
             self.CommandsGet(GUID);
             self.timeLineOptions.selectedTime(new Date(0));
             self.GetIntervals(GUID);
-            self.createRectsLines();
+            self.createRectsAndLines();
 
             if (!self.timeLineOptions.isZoom()) {
                 self.timeLineOptions.isZoom(true);
@@ -183,7 +192,7 @@ namespace rlab.nkpori {
             this.subscriptions.push(this.timeLineOptions.selectedTime.subscribe(newValue => {
                 this.updSVGRectState();
                 this.updBusLines();
-                this.updBkusniLights();
+                this.updBkusniIndicators();
             }, this));
         }
 
@@ -212,7 +221,7 @@ namespace rlab.nkpori {
         }
 
 
-        createRectsLines() {
+        createRectsAndLines() {
             let self = this;
             let rectangles = [];
             let lines = [];
@@ -228,7 +237,7 @@ namespace rlab.nkpori {
                 const instrGUID = instr.GUID.toString();
                 let instrTitle = instr.Title.toString();
 
-                //возможно стоит по-другому укорачивать название
+                //костыль 1, возможно стоит по-другому укорачивать название
                 if (instrTitle == "ОЗОНОМЕТР") {
                     instrTitle = "ОЗОН"
                 }
@@ -334,7 +343,7 @@ namespace rlab.nkpori {
 
 
         getLastConsonantIndex(str: string): number {
-            const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я', 'a', 'e', 'i', 'o', 'u'];
+            const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'];
             for (let i = 4; i >= 0; i--) {
                 if (!vowels.some((vowel) => str[i] === vowel) && /[a-zA-Zа-яА-Я]/.test(str[i])) {
                     return i;
@@ -368,73 +377,57 @@ namespace rlab.nkpori {
             for (var key in self.intervals) {
                 var value = self.intervals[key];
                 value.forEach(val => {
-                    if (value.length == 1) {
-                        self.mnemoRects().forEach(rect => {
-                            if (key == rect.GUID) {
-                                //rect.text("Расчет недоступен");
-                                //rect.fill("#ebebeb");
-                                //rect.Circle.css("#ebebeb");
-                            }
-                        })
-                    }
-                    else {
-                        if (selectedTime > val.startOffset && selectedTime < val.stopOffset) {
-                            self.states.forEach(state => {
-                                if (val.GUIDState == state.GUID) {
-                                    self.mnemoRects().forEach(rect => {
-                                        let title = "";
-                                        if (rect.GUID == state.GUIDInstrument) {
-                                            //rect.text(state.Title);
-                                            title = state.Title;
-                                            if (state.Title.length > 20) {
-                                                title = self.shortenTitle(state.Title);
-                                            }
 
-                                            rect.status(title);
-                                            rect.disabled(false);
 
-                                            if (state.Title == "Отключен") {
-                                                //rect.fill("#ebebeb");
-                                                rect.disabled(true);
-                                            }
-                                            else {
-                                                //rect.fill("#a8c6f7");
-                                            }
+                    if (selectedTime > val.startOffset) {
+                        self.states.forEach(state => {
+                            if (val.GUIDState == state.GUID) {
+                                self.mnemoRects().forEach(rect => {
+                                    let title = "";
+                                    if (rect.GUID == state.GUIDInstrument) {
 
-                                            if (val.GUIDState == "2e85bad5-6a49-ed11-8edc-00155d09ea1d") {
-                                                //rect.Circle.css("lightgreen");
-                                            }
-                                            else {
-                                                //rect.Circle.css("#ebebeb");
-                                            }
-
+                                        title = state.Title;
+                                        if (state.Title.length > 20) {
+                                            title = self.shortenTitle(state.Title);
                                         }
-                                    });
-                                }
-                                else if (val.GUIDState == "00000000-0000-0000-0000-000000000000") {
 
-                                }
-                            });
-                        }
+                                        rect.status(title);
+                                        rect.disabled(false);
+
+                                        if (state.Title === "Отключен") {
+                                            rect.disabled(true);
+                                        }
+                                    }
+                                });
+                            }
+
+                        });
                     }
                 });
+
+                //костыль 2, потому что первый интервал имеет startOffset "-1"
+                if (selectedTime < value[0].startOffset) {
+                    self.states.forEach(state => {
+                        value.forEach(val => {
+                            if (val.GUIDState == state.GUID) {
+                                self.mnemoRects().forEach(rect => {
+                                    rect.status("Отключен");
+                                    rect.disabled(true);
+                                });
+                            }
+                        });
+
+                    });
+                }
             }
         }
 
-        updBkusniLights() {
+        updBkusniIndicators() {
             // Сохраняем ссылку на текущий контекст
             const self = this;
 
             // Получаем выбранное время и переводим в секунды
             const selectedTime = self.timeLineOptions.selectedTime() / 1000;
-
-            // Массив GUID, с которыми мы будем работать
-            const targetGuids = [
-                "356768d1-ba5a-ed11-8edc-00155d09ea1d",
-                "346768d1-ba5a-ed11-8edc-00155d09ea1d",
-                "f235ecf3-a861-ed11-8edd-00155d09ea1d",
-                "db5debd7-645b-ed11-8edc-00155d09ea1d"
-            ];
 
             // Маппинг GUIDSequenceItemDef на соответствующее свойство видимости
             const visibilityMapping = {
@@ -449,37 +442,40 @@ namespace rlab.nkpori {
                 if (rect[visibilityProperty] !== undefined) {
                     // Устанавливаем видимость
                     rect[visibilityProperty](value);
-
-                    // Если есть состояние "disabled", обновляем его
-                    if (rect.disabled) {
-                        rect.disabled(false);
-                    }
                 }
             };
+
+            //костыль 3, для обнуления статусов лампочек
+            self.mnemoRects().forEach(rect => {
+                if (rect.GUID != "5ebdec99-ba5a-ed11-8edc-00155d09ea1d") {
+                    rect.kbv(false);
+                    rect.poll(false);
+                }
+            });
 
             // Проход по всем интервалам БКУСНИ и командам циклограммы
             self.kbvPollIntervals.forEach(interval => {
                 self.commands().forEach(cmd => {
                     let cmdOffset = cmd.Offset() / 1000;
 
-                    
-                    if (selectedTime > cmdOffset &&  cmdOffset === interval.startOffset ) {
+
+                    if (selectedTime > cmdOffset && cmdOffset === interval.startOffset) {
+
                         // Получаем соответствующее свойство видимости из маппинга
                         const visibilityProperty = visibilityMapping[cmd.GUIDSequenceItemDef];
-                        console.log(`selectedTime ${selectedTime}, cmdOffset ${cmdOffset},  val.startOffset ${interval.startOffset}, val.stopOffset ${interval.stopOffset},`);
-                        console.log(`Found suitable command with GUID ${cmd.GUID}`);
 
                         // Проходимся по параметрам команды
                         cmd.bitParameters.forEach(param => {
                             const rect = param.paramNumber > 2 ? self.mnemoRects()[param.paramNumber + 1] : self.mnemoRects()[param.paramNumber];
                             const value = param.value;
 
+
                             // Проверяем значение параметра и применяем видимость в зависимости от GUID команды
                             if (param.value) {
                                 if (cmd.GUIDSequenceItemDef === "356768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "f235ecf3-a861-ed11-8edd-00155d09ea1d") {
+                                    //console.log(`found suitable cmd with GUID ${cmd.GUID}`);
                                     if (value) {
                                         visibilitySetter(rect, visibilityProperty, true);
-                                        console.log(`засетил ${rect.title}`);
                                     }
                                 } else if (cmd.GUIDSequenceItemDef === "346768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "db5debd7-645b-ed11-8edc-00155d09ea1d") {
                                     if (value) {
@@ -489,17 +485,9 @@ namespace rlab.nkpori {
                             }
                         });
                     }
-                    
                 });
-            });
 
-            //Если выбранное время меньше первой команды опроса/КБВ либо больше последней, отключить
-            if (selectedTime < self.kbvPollIntervals[0].startOffset || selectedTime > self.kbvPollIntervals[self.kbvPollIntervals.length - 1].stopOffset) {
-                self.mnemoRects().forEach(rect => {
-                    rect.kbv(false);
-                    rect.poll(false);
-                });
-            }
+            });
         }
 
         getLightIntervals() {
@@ -623,7 +611,6 @@ namespace rlab.nkpori {
                     self.updTimeLine();
                     self.getLightIntervals();
 
-                    
                 },
                 error: function (data) {
                     console.log("Ошибка");

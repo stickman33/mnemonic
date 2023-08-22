@@ -43,13 +43,7 @@
     <script src="lib/script/rlab.services.js"></script>
     <script src="/lib/rlab.ext.date.js"></script>
     <script src="/lib/rlab.knockout.textFormat.js"></script>
-    <script src="lib/script/rlab.knockout.checkboxIndeterminate.js"></script>
 
-    <script src="lib/script/rlab.knockout.datetimeValue.js"></script>
-    <link rel="stylesheet" href="lib/css/rlab.knockout.datetimeValue.css" type="text/css" />
-
-    <script src="lib/script/rlab.knockout.timespanValue.js"></script>
-    <link rel="stylesheet" href="lib/css/rlab.knockout.timespanValue.css" type="text/css" />
 
 
     <script src="lib/script/rlab.timeline.js"></script>
@@ -114,7 +108,7 @@
                                     <text text-anchor="start" x="25" y="9.4" font-size="12" data-bind="attr: { text: statusLight.title, fill: statusLight.fillText }"></text>
                                 </g>
                             </g>
-                            <text text-anchor="start" x="5" y="75" font-size="14" fill="black" data-bind="text: status()"></text>
+                            <text text-anchor="start" x="3" y="75" font-size="14" fill="black" data-bind="text: status()"></text>
                         </g>
                     </g>
 
@@ -159,7 +153,7 @@
         <div class="row m-3">
 
             <div class="col" style="margin-top: 50px;">
-                <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime()"></span>
+                <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime() / 1000"></span>
             </div>
 
         </div>
