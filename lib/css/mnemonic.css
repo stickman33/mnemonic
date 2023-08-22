@@ -3,81 +3,84 @@
     overflow-x: hidden;
     overflow-y: hidden;
     background-color: lightgray;
-}
 
-.figure {
-    position: relative;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 95%;
-    margin: 15px;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
-.legend-poll {
-    display: flex;
-    align-items: center;
-    margin-right: 15px;
-    position: absolute;
-    bottom: -7%;
-    right: 20%;
+.light-on {
+    fill: lime;
 }
 
-.legend-kbv {
-    display: flex;
-    align-items: center;
-    margin-right: 15px;
-    position: absolute;
-    bottom: -7%;
-    right: 3%;
+.light-on circle {
+    stroke: black;
 }
 
-
-.legend-poll span:first-child {
-    display: inline-block;
-    width: 20px;
-    height: 2px;
-    background-color: blue;
-    margin-right: 5px;
+.light-on text {
+    fill: black;
 }
 
-.legend-kbv span:first-child {
-    display: inline-block;
-    width: 20px;
-    height: 2px;
-    background-color: green;
-    margin-right: 5px;
+.light-off {
+    fill: none;
 }
 
+.light-off circle {
+    stroke: #848a91;
+}
 
+.light-off text {
+    fill: #848a91;
+}
 
-@media (max-width: 1700px) and (min-width: 1400px) {
-    .legend-poll {
-        right: 25%;
+.enabled rect {
+    fill: #a8c6f7;
+    stroke: black;
+}
+
+.enabled text {
+    fill: black;
+}
+
+.enabled line {
+    stroke: black;
+}
+
+.enabled circle {
+    stroke: black;
+}
+
+.disabled rect {
+    fill: #ebebeb;
+    stroke: #848a91;
+}
+
+.disabled text {
+    fill: #848a91;
+}
+
+.disabled line {
+    stroke: #848a91;
+}
+
+.disabled circle {
+    stroke: #848a91;
+}
+
+@media (min-width: 1200px) {
+    .svg-container {
+        max-width: 1140px;
+        max-height: 500px;
     }
 }
 
 @media (max-width: 1399px) {
     .svg-container {
         overflow-x: auto;
-        min-height: 350px;
-    }
-
-    .legend-poll {
-        right: 30%;
-        bottom: -2%;
-    }
-
-    .legend-kbv {
-        bottom: -2%;
-    }
-
-    .legend-poll span:nth-child(2) {
-        font-size: 14px;
-    }
-
-    .legend-kbv span:nth-child(2) {
-        font-size: 14px;
+        min-height: 100px;
+        min-width: 300px;
     }
 }
 

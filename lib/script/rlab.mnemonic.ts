@@ -1,21 +1,32 @@
 ﻿namespace rlab.nkpori {
 
-    export interface Square {
+    export interface instrumentRect {
         GUID: string,
-        Title: string,
-        Circle: Circle,
-        fill: ko.Observable<string>,
-        stroke: ko.Observable<string>,
-        text: ko.Observable<string>,
-        top: string,
-        left: string,
-        width: ko.Observable<number>,
-        height: ko.Observable<number>,
-        index: number
+        title: string,
+        position: string,
+        disabled: ko.Observable<boolean>,
+        kbv: ko.Observable<boolean>,
+        poll: ko.Observable<boolean>,
+        status: ko.Observable<string>,
+        statusLight: ko.ObservableArray<instrumentLight>
     }
 
-    export interface Circle {
-        css: ko.Observable<string>
+    export interface dataBusLine {
+        GUID: string,
+        title: string,
+        cmdCoords: string,
+        dataCoords: string,
+        mainCmdVis: ko.Observable<boolean>,
+        mainDataVis: ko.Observable<boolean>,
+        reserveCmdVis: ko.Observable<boolean>,
+        reserveDataVis: ko.Observable<boolean>
+    }
+
+    export interface instrumentLight {
+        title: string,
+        //всего может быть до трёх лампочек! иначе не поместятся
+        position: string,
+        class: ko.Observable<string>
     }
 
     export interface interval {
@@ -24,15 +35,4 @@
         startOffset: number,
         stopOffset: number
     }
-
-    //export enum css {
-    //    fill_blue ="#a8c6f7",
-    //    fill_grey = "grey",
-    //    fill_yellow = "yellow",
-    //    fill_green = "green",
-    //    fill_yellowgreen = "yellowgreen",
-
-    //    stroke = "black",
-    //    strokeWidth = 1
-    //}
 }

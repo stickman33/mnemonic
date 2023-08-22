@@ -5,7 +5,7 @@
  *
  * Date: 2022-06-16 16:06:34
  */
---> 
+-->
 <html lang="en">
 
 <head>
@@ -43,13 +43,7 @@
     <script src="lib/script/rlab.services.js"></script>
     <script src="/lib/rlab.ext.date.js"></script>
     <script src="/lib/rlab.knockout.textFormat.js"></script>
-    <script src="lib/script/rlab.knockout.checkboxIndeterminate.js"></script>
 
-    <script src="lib/script/rlab.knockout.datetimeValue.js"></script>
-    <link rel="stylesheet" href="lib/css/rlab.knockout.datetimeValue.css" type="text/css" />
-
-    <script src="lib/script/rlab.knockout.timespanValue.js"></script>
-    <link rel="stylesheet" href="lib/css/rlab.knockout.timespanValue.css" type="text/css" />
 
 
     <script src="lib/script/rlab.timeline.js"></script>
@@ -84,28 +78,82 @@
             </div>
             <!--mnemonic-->
             <div class="col-lg-5 col-md-12 col-sm-12 col-12">
-                <div id="SVG" data-bind="if: isSVGvisible" class="container-fluid border border-dark svg-container">
-                    <figure id="figure" class="figure"></figure>
+                <svg id="SVGG" viewBox="0 0 800 375" xmlns="http://www.w3.org/2000/svg" class="border border-dark svg-container" data-bind="if: isSVGvisible">
+                    <!--instruments-->
+                    <g data-bind="foreach: mnemoRects">
+                        <g data-bind="attr: { id: title, transform: position, class: disabled() ? 'disabled' : 'enabled'}">
+                            <rect x="0" y="0" width="155" height="80" rx="5" ry="5" fill="#a8c6f7" stroke="black"></rect>
+                            <g>
+                                <text text-anchor="start" x="3" y="16" fill="black" data-bind="text: title"></text>
+                            </g>
+                            <!--rectangle borders-->
+                            <line x1="0" y1="20" x2="85" y2="20" stroke-width="1" />
+                            <line x1="85" y1="0" x2="85" y2="60" stroke-width="1" />
+                            <line x1="0" y1="60" x2="155" y2="60" stroke-width="1" />
+                            <!--bkusni lights-->
+                            <g transform="translate(0, 26)">
+                                <g data-bind="if: kbv() != undefined, attr: { class: kbv() ? 'light-on' : 'light-off' } " transform="translate(0, 0.5)">
+                                    <circle cx="9" cy="5" r="5"></circle>
+                                    <text text-anchor="start" x="19" y="9.4" font-size="12">КБВ</text>
+                                </g>
+                                <g data-bind="if: poll() != undefined, attr: { class: poll() ? 'light-on' : 'light-off' }, " transform="translate(0, 20.6)">
+                                    <circle cx="9" cy="5" r="5"></circle>
+                                    <text text-anchor="start" x="19" y="9.4" font-size="12">Опрос</text>
+                                </g>
+                            </g>
+                            <!--instrument lights-->
+                            <g data-bind="if: statusLight && statusLight().length > 0" transform="translate(5, 6.4)">
+                                <g transform="translate(75, 0.2)">
+                                    <circle cx="15" cy="5" r="5" stroke-width="1" data-bind="attr: { stroke: statusLight.stroke, fill: statusLight.fill }"></circle>
+                                    <text text-anchor="start" x="25" y="9.4" font-size="12" data-bind="attr: { text: statusLight.title, fill: statusLight.fillText }"></text>
+                                </g>
+                            </g>
+                            <text text-anchor="start" x="3" y="75" font-size="14" fill="black" data-bind="text: status()"></text>
+                        </g>
+                    </g>
 
-                    <div class="legend-kbv">
-                        <span></span>
-                        <span>Выдача КБВ</span>
-                    </div>
-                    <div class="legend-poll">
-                        <span></span>
-                        <span>Опрос прибора</span>
-                    </div>
-                </div>
 
+                    <!--lines-->
+                    <g data-bind="foreach: dataBusLines">
+                        <!--ОК-->
+                        <polyline stroke="green" stroke-width="2" data-bind="attr: { points: cmdCoords, visibility: mainCmdVis() == true ? 'visible' : 'hidden' }" fill="none" />
+                        <polyline stroke="blue" stroke-width="2" data-bind="attr: { points: dataCoords, visibility: mainDataVis() == true ? 'visible' : 'hidden' }" fill="none" />
+                        <!--РК-->
+                        <polyline stroke="green" stroke-width="2" data-bind="attr: { points: cmdCoords, visibility: reserveCmdVis() == true ? 'visible' : 'hidden' }" fill="none" stroke-dasharray="7" />
+                        <polyline stroke="blue" stroke-width="2" data-bind="attr: { points: dataCoords, visibility: reserveDataVis() == true ? 'visible' : 'hidden' }" fill="none" stroke-dasharray="7" />
+                    </g>
+
+
+                    <!--legend-->
+                    <g data-bind="if: isSVGvisible">
+                        <g transform="translate(500, 360)">
+                            <polyline points="0,0 20,0" style="stroke: green; stroke-width: 2;"></polyline>
+                            <text x="23" y="5" font-size="12px">Выдача команд ОК</text>
+                        </g>
+                        <g transform="translate(500, 380)">
+                            <polyline points="0,0 20,0" style="stroke: blue; stroke-width: 2;"></polyline>
+                            <text x="23" y="5" font-size="12px">Прием данных ОК</text>
+                        </g>
+
+                        <g transform="translate(655, 360)">
+                            <polyline points="0,0 20,0" style="stroke: green; stroke-width: 2;" stroke-dasharray="4"></polyline>
+                            <text x="23" y="5" font-size="12px">Выдача команд РК</text>
+                        </g>
+                        <g transform="translate(655, 380)">
+                            <polyline points="0,0 20,0" style="stroke: blue; stroke-width: 2;" stroke-dasharray="4"></polyline>
+                            <text x="23" y="5" font-size="12">Прием данных РК</text>
+                        </g>
+                    </g>
+
+                </svg>
             </div>
-
         </div>
 
         <!--row for selected time-->
         <div class="row m-3">
 
             <div class="col" style="margin-top: 50px;">
-                <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime()"></span>
+                <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime() / 1000"></span>
             </div>
 
         </div>
