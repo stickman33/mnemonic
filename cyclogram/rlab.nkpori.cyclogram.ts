@@ -1,4 +1,7 @@
 ﻿///<reference path="../lib/typing/knockout.d.ts" />
+///<reference path="../lib/rlab.nkpori.common.ts" />
+///<reference path="../lib/script/rlab.services.ts" />
+///<reference path="../lib/script/rlab.mnemonic.ts" />
 
 
 namespace rlab.nkpori {
@@ -155,9 +158,8 @@ namespace rlab.nkpori {
 
             this.GetInstruments();
             this.GetCommandDefinition();
-            this.timeLineOptions;
             this.GetStates();
-
+            
         }
 
         dispose() {
@@ -178,16 +180,17 @@ namespace rlab.nkpori {
             self.CommandsGet(GUID);
             self.timeLineOptions.selectedTime(new Date(0));
             self.GetIntervals(GUID);
-            self.createRectsAndLines();
+
+            //self.createRectsAndLines();
 
             if (!self.timeLineOptions.isZoom()) {
                 self.timeLineOptions.isZoom(true);
 
             }
 
-            if (!self.isSVGvisible()) {
-                self.isSVGvisible(true);
-            }
+            //if (!self.isSVGvisible()) {
+            //    self.isSVGvisible(true);
+            //}
 
             this.subscriptions.push(this.timeLineOptions.selectedTime.subscribe(newValue => {
                 this.updSVGRectState();
@@ -237,9 +240,9 @@ namespace rlab.nkpori {
                 const instrGUID = instr.GUID.toString();
                 let instrTitle = instr.Title.toString();
 
-                //костыль 1, возможно стоит по-другому укорачивать название
-                if (instrTitle == "ОЗОНОМЕТР") {
-                    instrTitle = "ОЗОН"
+                // Укорачиваем название прибора, чтобы влезал в прямоугольник
+                if (instrTitle.length > 8) {
+                    instrTitle = self.shortenTitle(instrTitle);
                 }
 
 
@@ -248,7 +251,7 @@ namespace rlab.nkpori {
                         GUID: instrGUID,
                         title: instrTitle,
                         position: "translate(323,130)",
-                        disabled: ko.observable(true),
+                        visibility: ko.observable("disabled"),
                         kbv: ko.observable(),
                         poll: ko.observable(),
                         status: ko.observable("Расчет недоступен"),
@@ -262,7 +265,7 @@ namespace rlab.nkpori {
                         GUID: instrGUID,
                         title: instrTitle,
                         position: `translate(${x},${y})`,
-                        disabled: ko.observable(true),
+                        visibility: ko.observable("disabled"),
                         kbv: ko.observable(false),
                         poll: ko.observable(false),
                         status: ko.observable("Расчет недоступен"),
@@ -298,7 +301,7 @@ namespace rlab.nkpori {
                                 GUID: instrGUID,
                                 title: instrTitle,
                                 position: "translate(1,130)",
-                                disabled: ko.observable(true),
+                                visibility: ko.observable("disabled"),
                                 kbv: ko.observable(false),
                                 poll: ko.observable(false),
                                 status: ko.observable("Расчет недоступен"),
@@ -312,7 +315,7 @@ namespace rlab.nkpori {
                                 GUID: instrGUID,
                                 title: instrTitle,
                                 position: "translate(643,130)",
-                                disabled: ko.observable(true),
+                                visibility: ko.observable("disabled"),
                                 kbv: ko.observable(false),
                                 poll: ko.observable(false),
                                 status: ko.observable("Расчет недоступен"),
@@ -337,7 +340,6 @@ namespace rlab.nkpori {
                 rectangles.push(rect);
             });
             self.mnemoRects(rectangles);
-
             self.dataBusLines(lines);
         }
 
@@ -345,12 +347,13 @@ namespace rlab.nkpori {
         getLastConsonantIndex(str: string): number {
             const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'];
             for (let i = 4; i >= 0; i--) {
-                if (!vowels.some((vowel) => str[i] === vowel) && /[a-zA-Zа-яА-Я]/.test(str[i])) {
+                if (!vowels.some((vowel) => str[i].toLowerCase() === vowel) && /[a-zA-Zа-яА-Я]/.test(str[i])) {
                     return i;
                 }
             }
             return -1;
         }
+
 
         shortenTitle(title: string): string {
             let self = this;
@@ -371,6 +374,7 @@ namespace rlab.nkpori {
         }
 
         updSVGRectState() {
+            let startTime = Date.now() / 1000;
             let self = this;
             var selectedTime = self.timeLineOptions.selectedTime() / 1000;
 
@@ -388,14 +392,14 @@ namespace rlab.nkpori {
 
                                         title = state.Title;
                                         if (state.Title.length > 20) {
-                                            title = self.shortenTitle(state.Title);
+                                         title = self.shortenTitle(state.Title);
                                         }
 
                                         rect.status(title);
-                                        rect.disabled(false);
+                                        rect.visibility("enabled");
 
                                         if (state.Title === "Отключен") {
-                                            rect.disabled(true);
+                                            rect.visibility("disabled");
                                         }
                                     }
                                 });
@@ -412,7 +416,7 @@ namespace rlab.nkpori {
                             if (val.GUIDState == state.GUID) {
                                 self.mnemoRects().forEach(rect => {
                                     rect.status("Отключен");
-                                    rect.disabled(true);
+                                    rect.visibility("disabled");
                                 });
                             }
                         });
@@ -423,7 +427,6 @@ namespace rlab.nkpori {
         }
 
         updBkusniIndicators() {
-            // Сохраняем ссылку на текущий контекст
             const self = this;
 
             // Получаем выбранное время и переводим в секунды
@@ -453,41 +456,55 @@ namespace rlab.nkpori {
                 }
             });
 
-            // Проход по всем интервалам БКУСНИ и командам циклограммы
-            self.kbvPollIntervals.forEach(interval => {
-                self.commands().forEach(cmd => {
-                    let cmdOffset = cmd.Offset() / 1000;
+            // Проверяем, есть ли ошибка в интервалах
+            let exists = self.kbvPollIntervals.some(
+                (interval) => interval.GUIDState === "00000000-0000-0000-0000-000000000000"
+            );
+
+            if (exists) {
+                self.mnemoRects()[3].visibility("error");
+                self.mnemoRects()[3].status("Ошибка мат модели");
+            }
+
+            else {
+                // Проход по всем интервалам БКУСНИ и командам циклограммы
+                self.kbvPollIntervals.forEach(interval => {
+                    self.commands().forEach(cmd => {
+                        let cmdOffset = cmd.Offset() / 1000;
 
 
-                    if (selectedTime > cmdOffset && cmdOffset === interval.startOffset) {
+                        if (selectedTime > cmdOffset && cmdOffset === interval.startOffset) {
 
-                        // Получаем соответствующее свойство видимости из маппинга
-                        const visibilityProperty = visibilityMapping[cmd.GUIDSequenceItemDef];
+                            // Получаем соответствующее свойство видимости из маппинга
+                            const visibilityProperty = visibilityMapping[cmd.GUIDSequenceItemDef];
 
-                        // Проходимся по параметрам команды
-                        cmd.bitParameters.forEach(param => {
-                            const rect = param.paramNumber > 2 ? self.mnemoRects()[param.paramNumber + 1] : self.mnemoRects()[param.paramNumber];
-                            const value = param.value;
+                            // Проходимся по параметрам команды
+                            cmd.bitParameters.forEach(param => {
+                                const rect = param.paramNumber > 2 ? self.mnemoRects()[param.paramNumber + 1] : self.mnemoRects()[param.paramNumber];
+                                const value = param.value;
 
-
-                            // Проверяем значение параметра и применяем видимость в зависимости от GUID команды
-                            if (param.value) {
-                                if (cmd.GUIDSequenceItemDef === "356768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "f235ecf3-a861-ed11-8edd-00155d09ea1d") {
-                                    //console.log(`found suitable cmd with GUID ${cmd.GUID}`);
-                                    if (value) {
-                                        visibilitySetter(rect, visibilityProperty, true);
-                                    }
-                                } else if (cmd.GUIDSequenceItemDef === "346768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "db5debd7-645b-ed11-8edc-00155d09ea1d") {
-                                    if (value) {
-                                        visibilitySetter(rect, visibilityProperty, false);
+                                // Проверяем значение параметра и применяем видимость в зависимости от GUID команды
+                                if (param.value) {
+                                    // Включить опрос, включить КБВ
+                                    if (cmd.GUIDSequenceItemDef === "356768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "f235ecf3-a861-ed11-8edd-00155d09ea1d") {
+                                        //console.log(`found suitable cmd with GUID ${cmd.GUID}`);
+                                        if (value) {
+                                            visibilitySetter(rect, visibilityProperty, true);
+                                        }
+                                    // Включить опрос, включить КБВ
+                                    } else if (cmd.GUIDSequenceItemDef === "346768d1-ba5a-ed11-8edc-00155d09ea1d" || cmd.GUIDSequenceItemDef === "db5debd7-645b-ed11-8edc-00155d09ea1d") {
+                                        if (value) {
+                                            visibilitySetter(rect, visibilityProperty, false);
+                                        }
                                     }
                                 }
-                            }
-                        });
-                    }
-                });
+                            });
+                        }
+                    });
 
-            });
+                });
+            }
+            
         }
 
         getLightIntervals() {
@@ -607,9 +624,20 @@ namespace rlab.nkpori {
                         self.intervals[instr.Key] = tmp_intervals;
                     });
 
+                    // Добавить функцию обнуления значений, при открытии новой циклограммы!
+                    self.createRectsAndLines();
+
                     self.updSVGRectState();
+                    self.updBusLines();
+                    self.updBkusniIndicators();
+
+                    if (!self.isSVGvisible()) {
+                        self.isSVGvisible(true);
+                    }
                     self.updTimeLine();
                     self.getLightIntervals();
+
+
 
                 },
                 error: function (data) {
@@ -678,6 +706,7 @@ namespace rlab.nkpori {
                         self.intervals[instr.GUID] = {};
                     });
 
+                    self.createRectsAndLines();
                     console.log("приборы на мнемосхеме построены");
                 },
 

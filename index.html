@@ -37,6 +37,7 @@
     <script type="text/javascript" src="/lib/sequenceeditor/sequenceeditor.common.js"></script>
     <script type="text/javascript" src="js/sequenceviewerNI.js"></script>
     <script type="text/javascript" src="js/sequenceviewerNI.colmodel.master.js"></script>
+    <script type="text/javascript" src="js/sequenceviewerNI.colmodel.detail.js"></script>
 
 
     <script src="/lib/knockout.js"></script>
@@ -75,13 +76,18 @@
                     <div id="jqGridMasterPager"></div>
                 </div>
 
+                <div id="jqGridDetailContainer" style="margin-top: 15px;">
+                    <table id="jqGridDetail"></table>
+                    <div id="jqGridDetailPager"></div>
+                </div>
+
             </div>
             <!--mnemonic-->
             <div class="col-lg-5 col-md-12 col-sm-12 col-12">
                 <svg id="SVGG" viewBox="0 0 800 375" xmlns="http://www.w3.org/2000/svg" class="border border-dark svg-container" data-bind="if: isSVGvisible">
                     <!--instruments-->
                     <g data-bind="foreach: mnemoRects">
-                        <g data-bind="attr: { id: title, transform: position, class: disabled() ? 'disabled' : 'enabled'}">
+                        <g data-bind="attr: { id: title, transform: position, class: visibility() }">
                             <rect x="0" y="0" width="155" height="80" rx="5" ry="5" fill="#a8c6f7" stroke="black"></rect>
                             <g>
                                 <text text-anchor="start" x="3" y="16" fill="black" data-bind="text: title"></text>
@@ -108,7 +114,7 @@
                                     <text text-anchor="start" x="25" y="9.4" font-size="12" data-bind="attr: { text: statusLight.title, fill: statusLight.fillText }"></text>
                                 </g>
                             </g>
-                            <text text-anchor="start" x="3" y="75" font-size="14" fill="black" data-bind="text: status()"></text>
+                            <text id="status" text-anchor="start" x="3" y="75" font-size="14" fill="black" data-bind="text: status()"></text>
                         </g>
                     </g>
 
@@ -149,26 +155,33 @@
             </div>
         </div>
 
-        <!--row for selected time-->
-        <div class="row m-3">
+            <!--row for selected time-->
+            <div class="row m-3">
 
-            <div class="col" style="margin-top: 50px;">
-                <span data-bind="text: 'Выбранное время: ' + $root.timeLineOptions.selectedTime() / 1000"></span>
-            </div>
+                <div class="col">
+                    <span data-bind="text: timeLineOptions.selectedTime() > 0 
+                          ? 'Выбранное время: '
+                          + String(Math.floor($root.timeLineOptions.selectedTime() / 3600000)).padStart(2, '0') + ':'
+                          + String(Math.floor(($root.timeLineOptions.selectedTime() % 3600000) / 60000)).padStart(2, '0') + ':'
+                          + String(Math.floor(($root.timeLineOptions.selectedTime() % 60000) / 1000)).padStart(2, '0')
+                          : 'Выбранное время: 00:00:00'">
+                    </span>
 
-        </div>
-
-        <!--row for timeline-->
-        <div class="row m-3">
-            <div class="col">
-
-                <div data-bind="if: isTimeLineVisible">
-                    <div data-bind="component: { name: 'timeline', params: timeLineOptions }"></div>
                 </div>
 
             </div>
-        </div>
-    </main>
+
+            <!--row for timeline-->
+            <div class="row m-3">
+                <div class="col">
+
+                    <div data-bind="if: isTimeLineVisible">
+                        <div data-bind="component: { name: 'timeline', params: timeLineOptions }"></div>
+                    </div>
+
+                </div>
+            </div>
+</main>
 
 
 

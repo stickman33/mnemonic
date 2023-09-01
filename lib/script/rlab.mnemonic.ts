@@ -4,7 +4,7 @@
         GUID: string,
         title: string,
         position: string,
-        disabled: ko.Observable<boolean>,
+        visibility: ko.Observable<string>,
         kbv: ko.Observable<boolean>,
         poll: ko.Observable<boolean>,
         status: ko.Observable<string>,

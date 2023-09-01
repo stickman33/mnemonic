@@ -14,19 +14,24 @@ $(document).ready(function () {
 	let idToSelect; // Variable to set a new row selected in the sequences table, so the table scrolls to the row
 	console.log(idToSelect);
 	let $sequencesTable = $('#jqGridMaster'),
-		$sequenceItemsTable = $('#jqGridDetail');
+		$sequenceItemsTable = $('#jqGridDetail'),
+		sequenceItemsTablePager = '#jqGridDetailPager';
 	// let lastRowIdx = {};
 
-	let seqItemDefReq = serviceRequest(sequenceItemDefUrl, 'GET', {}, {}, { dataType: 'json' });
+	let seqItemDefReq = serviceRequest(sequenceItemDefUrl, 'GET', {}, {}, { dataType: 'json' }),
+		errItemDefReq = serviceRequest(errorItemDefUrl, 'GET', {}, {}, { dataType: 'json' });
 
 	$.when(
-		seqItemDefReq
+		seqItemDefReq,
+		errItemDefReq
 	).done(
 		function (
-			seqItemDefReqVal
+			seqItemDefReqVal,
+			errItemDefReqVal
 		) {
 
 			let sequenceItemDef = seqItemDefReqVal[0],
+				exceptionDef = errItemDefReqVal[0],
 				lastSel,
 				topPagerDiv = $('#jqGridDetail_toppager')[0],
 				botPagerDiv = $('#jqGridDetailPager')[0];
@@ -43,8 +48,8 @@ $(document).ready(function () {
 					editurl: sequenceNIUrl,
 					forceClientSorting: true,
 					navOptions: { reloadGridOptions: { fromServer: true } },
-					rowNum: 5,
-					rowList: [5, 10, 20, 30],
+					rowNum: 10,
+					rowList: [5, 10, 20, 30, "10000:All"],
 					multiselect: false,
 					sortname: 'UIModified',
 					sortorder: 'desc',
@@ -197,6 +202,110 @@ $(document).ready(function () {
 					};
 				},
 			});
+
+			// Sequence items grid
+			$sequenceItemsTable.jqGrid($.extend(
+				{}, // SequenceItems grid options object
+				gridCommonOptions,
+				{ // SequenceItems grid actual options
+					caption: $.jgrid.locales.ru.detailTable.caption || 'Cyclogram',
+					pager: sequenceItemsTablePager,
+					url: sequenceItemNIUrl,
+					editurl: sequenceItemNIUrl,
+					height: 300,
+					multiselect: false,
+					userDataOnFooter: true,
+					userDataOnHeader: true,
+					altRows: true,
+					sortname: 'Offset',
+					sortorder: 'asc',
+					loadonce: true,
+					rowNum: -1,
+					forceClientSorting: true,
+					hiddengrid: true,
+					colModel: detailColModel(sequenceItemDef, exceptionDef),
+					beforeSelectRow: handleMultiSelect, // handle multi select
+					navOptions: {
+						reloadGridOptions: {
+							fromServer: true
+						}
+					},
+					actionsNavOptions: {
+
+					},
+					loadComplete: function (data) {
+						var grid = $(this), param, gridId;
+						var iCol = getColumnIndexByName(grid, 'actions');
+						param = grid.jqGrid('getGridParam');
+						gridId = param['id'];
+
+						$("#del_" + gridId).removeClass('disabled');
+						$("#del_" + gridId + "_top").removeClass('disabled');
+						$("#shiftToPos_" + gridId).removeClass('disabled');
+						$("#shiftToPos_" + gridId + "_top").removeClass('disabled');
+						$("#setTimePos_" + gridId).removeClass('disabled');
+						$("#setTimePos_" + gridId + "_top").removeClass('disabled');
+						$("#setHalfSet_" + gridId).removeClass('disabled');
+						$("#setHalfSet_" + gridId + "_top").removeClass('disabled');
+
+						// There is a bug in jquery.jqgrid.src.js. 
+						// Even if editformbutton is set to true and actionsNavOptions is set to hide edit button, 
+						// one has to remove manually the edit button (like it is done here). 
+						// Otherwise inline edit buttons will be visible and active. Is to make fork???
+						$(this).find('>tbody>tr.jqgrow>td:nth-child(' + (iCol + 1) + ')')
+							.each(function () {
+								$('div[data-jqactionname="edit"]', this).attr('style', 'display:none;')
+							});
+						if (idToSelect) {
+							grid.jqGrid('setSelection', idToSelect);
+							//$("#" + $.jgrid.jqID(idToSelect)).effect("highlight", {}, 3000);
+						}
+					},
+					loadError: function (xhr, status, error) {
+						console.log(xhr, status, error);
+					},
+					formEditing: {
+						//width: 710,
+						closeOnEscape: true,
+						closeAfterEdit: true,
+						//savekey: [true, 13]
+					},
+					onSelectAll: function () {
+						let grid = $(this),
+							param = grid.jqGrid('getGridParam'),
+							buttons = ['del', 'shiftToPos', 'setTimePos', 'setHalfSet'];
+
+						toggleButtons(param.id, buttons, checkCanExecute(param.selarrrow, param.data, sequenceItemDef));
+
+					},
+					onSelectRow: function () {
+						let grid = $(this),
+							value,
+							selrow,
+							param = grid.jqGrid('getGridParam');
+						// Check if there are any rows in grid
+						// If there are rows 
+						if (param.data.length > 0) {
+							selrow = param['selrow'];
+
+							// The new command Offset
+							// One or more rows selected, set Offset = last SELECTED command Offset + 
+							if (selrow) {
+								let rowData = param.data.find(item => item.GUID == selrow);
+
+								value = parseInt(rowData.Offset) * 1000 + 1;
+								IndexViewModel.timeLineOptions.selectedTime(new Date(value));
+							}
+							// No rows at all, set Offset = 0	
+						} else {
+							value = 0;
+						}
+					},
+				}
+			));
+
+
+
 
 			// Some functions
 			function checkCanExecute(selGUIDs, gridData, def) {

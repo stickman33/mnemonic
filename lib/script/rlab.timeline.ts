@@ -119,11 +119,14 @@ namespace rlab {
         selectedTimeChanged: EventHandler = new EventHandler();
         
         clickHandler: any = this.OnClick.bind(this);
+
         mouseDownHandler: any = this.OnMouseDown.bind(this);
         mouseMoveHandler: any = this.OnMouseMove.bind(this);
         mouseUpHandler: any = this.OnMouseUp.bind(this);
         mouseWheelHandler: any = this.OnMouseWheel.bind(this);
+
         touchStartHandler: any = this.OnTouchStart.bind(this);
+
         touchMoveHandler: any = this.OnTouchMove.bind(this);
         touchEndHandler: any = this.OnTouchEnd.bind(this);
 

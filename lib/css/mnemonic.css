@@ -69,6 +69,15 @@
     stroke: #848a91;
 }
 
+.error rect {
+    fill: #f39a9a;
+}
+
+.error line {
+    stroke: black;
+}
+
+
 @media (min-width: 1200px) {
     .svg-container {
         max-width: 1000px;
